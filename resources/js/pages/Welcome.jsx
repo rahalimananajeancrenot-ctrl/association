@@ -14,7 +14,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
 
     return (
         <>
-            <Head title="Welcome" />
+            <Head title="Bien venue" />
             <div className="bg-gray-50 text-black/50 dark:bg-black dark:text-white/50">
                 <img
                     id="background"
@@ -350,9 +350,9 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                             </div>
                         </main>
 
-                        <footer className="py-16 text-center text-sm text-black dark:text-white/70">
-                            Laravel v{laravelVersion} (PHP v{phpVersion})
-                        </footer>
+                            <footer className="py-16 text-center text-sm text-black dark:text-white/70">
+                                Laravel v{laravelVersion} (PHP v{phpVersion})
+                            </footer>
                     </div>
                 </div>
             </div>

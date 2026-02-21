@@ -155,7 +155,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                 href={route('logout')}
                                 as="button"
                             >
-                                Log Out
+                                Deconnexion
                             </ResponsiveNavLink>
                         </div>
                     </div>
