@@ -20,11 +20,8 @@ export default forwardRef(function TextInput(
         <input
             {...props}
             type={type}
-            className={
-                'rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 ' +
-                className
-            }
             ref={localRef}
+            className={`input input-bordered w-full rounded-sm bg-white text-gray-900 dark:bg-gray-800 dark:text-white ${className}`}
         />
     );
 });

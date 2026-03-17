@@ -32,7 +32,8 @@ export default function Login({ status, canResetPassword }) {
             )}
 
             <form onSubmit={submit}>
-                <div>
+                <h1 className='text-center text-3xl'>Connectez-vous</h1>
+                <div className="w-full">
                     <InputLabel htmlFor="email" value="Email" />
 
                     <TextInput
@@ -49,7 +50,7 @@ export default function Login({ status, canResetPassword }) {
                     <InputError message={errors.email} className="mt-2" />
                 </div>
 
-                <div className="mt-4">
+                <div className="mt-4 w-full">
                     <InputLabel htmlFor="password" value="Password" />
 
                     <TextInput
@@ -74,7 +75,7 @@ export default function Login({ status, canResetPassword }) {
                                 setData('remember', e.target.checked)
                             }
                         />
-                        <span className="ms-2 text-sm text-gray-600">
+                        <span className="ms-2 text-sm">
                             Remember me
                         </span>
                     </label>
@@ -84,14 +85,14 @@ export default function Login({ status, canResetPassword }) {
                     {canResetPassword && (
                         <Link
                             href={route('password.request')}
-                            className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                            className="rounded-md text-sm underline hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                         >
                             Forgot your password?
                         </Link>
                     )}
 
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        Log in
+                    <PrimaryButton className="ms-4 bg-emerald-700 px-2" disabled={processing}>
+                        Connexion
                     </PrimaryButton>
                 </div>
             </form>

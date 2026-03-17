@@ -46,6 +46,7 @@ export default function Register({ etablissements, entites, logements }) {
         <GuestLayout>
             <Head title="Register" />
             <form onSubmit={submit} className="space-y-4">
+                <h1 className='text-center text-3xl'>Ajouter un nouveau membre</h1>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Name */}
                     <div>
@@ -106,7 +107,7 @@ export default function Register({ etablissements, entites, logements }) {
                         <input
                             id="image"
                             type="file"
-                            className="mt-1 block w-full"
+                            className="mt-1 block w-full rounded-md bg-white text-gray-900 dark:bg-gray-800 dark:text-white"
                             onChange={(e) => setData('image', e.target.files[0])}
                         />
                         <InputError message={errors.image} className="mt-2" />
@@ -121,7 +122,7 @@ export default function Register({ etablissements, entites, logements }) {
                                 setData('niveau_id', e.target.value);
                                 setData('classe_id', ''); // reset classe
                             }}
-                            className="mt-1 block w-full border-gray-300 rounded-md"
+                            className="mt-1 block w-full border-gray-300 rounded-md bg-white text-gray-900 dark:bg-gray-800 dark:text-white"
                             required
                         >
                             <option value="">-- Choisir un niveau --</option>
@@ -131,13 +132,13 @@ export default function Register({ etablissements, entites, logements }) {
                         <InputError message={errors.niveau_id} className="mt-2" />
                     </div>
 
-                    {/* Classe dépendante */}
+                    {/* Classe */}
                     <div>
                         <InputLabel value="Classe" />
                         <select
                             value={data.classe_id}
                             onChange={(e) => setData('classe_id', e.target.value)}
-                            className="mt-1 block w-full border-gray-300 rounded-md"
+                            className="mt-1 block w-full border-gray-300 rounded-md bg-white text-gray-900 dark:bg-gray-800 dark:text-white"
                             required
                             disabled={!data.niveau_id}
                         >
@@ -157,7 +158,7 @@ export default function Register({ etablissements, entites, logements }) {
                         <select
                             value={data.etablissement_id}
                             onChange={(e) => setData('etablissement_id', e.target.value)}
-                            className="mt-1 block w-full border-gray-300 rounded-md"
+                            className="mt-1 block w-full border-gray-300 rounded-md bg-white text-gray-900 dark:bg-gray-800 dark:text-white"
                             required
                         >
                             <option value="">-- Choisir un établissement --</option>
@@ -176,7 +177,7 @@ export default function Register({ etablissements, entites, logements }) {
                         <select
                             value={data.entite_id}
                             onChange={(e) => setData('entite_id', e.target.value)}
-                            className="mt-1 block w-full border-gray-300 rounded-md"
+                            className="mt-1 block w-full border-gray-300 rounded-md bg-white text-gray-900 dark:bg-gray-800 dark:text-white"
                             required
                         >
                             <option value="">-- Choisir une entité --</option>
@@ -195,7 +196,7 @@ export default function Register({ etablissements, entites, logements }) {
                         <select
                             value={data.logement_id}
                             onChange={(e) => setData('logement_id', e.target.value)}
-                            className="mt-1 block w-full border-gray-300 rounded-md"
+                            className="mt-1 block w-full border-gray-300 rounded-md bg-white text-gray-900 dark:bg-gray-800 dark:text-white"
                             required
                         >
                             <option value="">-- Choisir un logement --</option>
@@ -240,12 +241,12 @@ export default function Register({ etablissements, entites, logements }) {
                 <div className="mt-6 flex items-center justify-end">
                     <Link
                         href={route('login')}
-                        className="text-sm text-gray-600 underline"
+                        className="text-sm underline"
                     >
                         Déjà inscrit ?
                     </Link>
 
-                    <PrimaryButton className="ms-4" disabled={processing}>
+                    <PrimaryButton className="ms-4 bg-emerald-700 px-2" disabled={processing}>
                         Enregistrer un nouveau membre
                     </PrimaryButton>
                 </div>

@@ -9,11 +9,11 @@ export default function ResponsiveNavLink({
     return (
         <Link
             {...props}
-            className={`flex w-full items-start border-l-4 py-2 pe-4 ps-3 ${
-                active
-                    ? 'border-indigo-400 bg-indigo-50 text-indigo-700 focus:border-indigo-700 focus:bg-indigo-100 focus:text-indigo-800'
-                    : 'border-transparent text-gray-600 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-800 focus:border-gray-300 focus:bg-gray-50 focus:text-gray-800'
-            } text-base font-medium transition duration-150 ease-in-out focus:outline-none ${className}`}
+            className={`flex w-full items-center py-2 px-3 rounded-lg transition-colors duration-150 ease-in-out 
+                ${active 
+                    ? 'bg-primary text-primary-content'  // DaisyUI gère la couleur active
+                    : 'bg-base-100 text-base-content hover:bg-base-200 hover:text-base-content dark:bg-base-200 dark:text-base-content dark:hover:bg-base-300'
+                } ${className}`}
         >
             {children}
         </Link>
