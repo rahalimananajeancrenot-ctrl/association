@@ -16,7 +16,7 @@ const Dropdown = ({ children }) => {
 };
 
 const Trigger = ({ children }) => {
-    const { open, setOpen, toggleOpen } = useContext(DropDownContext);
+    const { toggleOpen, setOpen, open } = useContext(DropDownContext);
 
     return (
         <>
@@ -29,7 +29,7 @@ const Trigger = ({ children }) => {
 const Content = ({
     align = 'right',
     width = '48',
-    contentClasses = 'py-1 bg-base-100 dark:bg-base-300',
+    contentClasses = 'py-1 bg-white dark:bg-zinc-800 shadow-lg rounded-md ring-1 ring-black ring-opacity-5',
     children,
 }) => {
     const { open, setOpen } = useContext(DropDownContext);
@@ -51,12 +51,10 @@ const Content = ({
             leaveTo="opacity-0 scale-95"
         >
             <div
-                className={`absolute z-50 mt-2 rounded-md shadow-lg ${alignmentClasses} ${widthClasses}`}
+                className={`absolute z-50 mt-2 ${alignmentClasses} ${widthClasses}`}
                 onClick={() => setOpen(false)}
             >
-                <div className={`rounded-md ring-1 ring-black ring-opacity-5 ${contentClasses}`}>
-                    {children}
-                </div>
+                <div className={contentClasses}>{children}</div>
             </div>
         </Transition>
     );

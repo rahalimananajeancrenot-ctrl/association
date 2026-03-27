@@ -35,6 +35,7 @@
         "typescript-eslint": "^8.23.0"
     },
     "dependencies": {
+        "@inertiajs/inertia": "^0.11.1",
         "@inertiajs/react": "^2.1.0",
         "@tailwindcss/vite": "^4.1.11",
         "@types/react": "^19.2.0",

@@ -68,12 +68,12 @@ export default function GuestLayout({ children, auth }) {
                                 Connexion
                             </Link>
 
-                            <Link
+                            {/* <Link
                                 href={route('register')}
                                 className="px-4 py-2 bg-[#FF2D20] text-white rounded-md"
                             >
                                 Inscription
-                            </Link>
+                            </Link> */}
                         </>
                     )}
                 </nav>
