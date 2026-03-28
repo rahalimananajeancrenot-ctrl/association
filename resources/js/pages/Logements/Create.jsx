@@ -1,4 +1,4 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import AppLayout from '@/Layouts/AppLayout';
 import { useForm, Head } from '@inertiajs/react';
 
 export default function Create({ types }) {
@@ -15,7 +15,7 @@ export default function Create({ types }) {
     };
 
     return (
-        <AuthenticatedLayout header={<h2 className="dark:text-white">Créer logement</h2>}>
+        <AppLayout header={<h2 className="dark:text-white">Créer logement</h2>}>
             <Head title="Créer" />
 
             <form onSubmit={submit} className="p-6 space-y-4">
@@ -58,9 +58,9 @@ export default function Create({ types }) {
                     ))}
                 </select>
 
-                <button className="btn btn-primary w-full">Créer</button>
+                <button className="btn btn-primary bg-blue-800 text-white w-full">Créer</button>
 
             </form>
-        </AuthenticatedLayout>
+        </AppLayout>
     );
 }

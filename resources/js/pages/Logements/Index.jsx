@@ -1,15 +1,33 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import AppLayout from '@/Layouts/AppLayout';
 import { Head, Link } from '@inertiajs/react';
 import { useState } from 'react';
 import { Inertia } from '@inertiajs/inertia';
+import Swal from 'sweetalert2'; // ← import SweetAlert2
+import 'sweetalert2/dist/sweetalert2.min.css';
 
 export default function Index({ logements = [], types = [] }) {
     const [filterType, setFilterType] = useState(null);
 
     const deleteLogement = (id) => {
-        if (confirm('Supprimer ?')) {
-            Inertia.delete(`/logements/${id}`);
-        }
+        Swal.fire({
+            title: 'Êtes-vous sûr ?',
+            text: "Cette action est irréversible !",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Oui, supprimer !',
+            cancelButtonText: 'Annuler'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Inertia.delete(`/logements/${id}`);
+                Swal.fire(
+                    'Supprimé !',
+                    'Le logement a été supprimé.',
+                    'success'
+                );
+            }
+        });
     };
 
     const filteredLogements = filterType
@@ -17,7 +35,7 @@ export default function Index({ logements = [], types = [] }) {
         : logements;
 
     return (
-        <AuthenticatedLayout header={<h2 className="text-xl font-semibold dark:text-white">Logements</h2>}>
+        <AppLayout header={<h2 className="text-xl font-semibold dark:text-white">Logements</h2>}>
             <Head title="Logements" />
 
             <div className="p-6 bg-gray-100 dark:bg-black min-h-screen space-y-4">
@@ -89,6 +107,6 @@ export default function Index({ logements = [], types = [] }) {
                     </table>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </AppLayout>
     );
 }

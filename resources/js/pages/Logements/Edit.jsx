@@ -1,4 +1,4 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import AppLayout from '@/Layouts/AppLayout';
 import { useForm, Head } from '@inertiajs/react';
 
 export default function Edit({ logement, types }) {
@@ -15,7 +15,7 @@ export default function Edit({ logement, types }) {
     };
 
     return (
-        <AuthenticatedLayout header={<h2 className="dark:text-white">Modifier</h2>}>
+        <AppLayout header={<h2 className="dark:text-white">Modifier</h2>}>
             <Head title="Modifier" />
 
             <div className="p-6 bg-gray-100 dark:bg-black min-h-screen">
@@ -54,6 +54,6 @@ export default function Edit({ logement, types }) {
 
                 </form>
             </div>
-        </AuthenticatedLayout>
+        </AppLayout>
     );
 }

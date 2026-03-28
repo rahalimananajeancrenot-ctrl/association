@@ -27,6 +27,10 @@ Route::middleware('auth')->group(function () {
 
 Route::middleware(['auth', 'role:Logement'])->group(function () {
     Route::resource('logements', LogementController::class);
+
+    Route::get('/logement/dashboard', function () {
+        return Inertia::render('Logements/Dashboard');
+    })->name('dashboard.logements');
 });
 
 require __DIR__.'/auth.php';

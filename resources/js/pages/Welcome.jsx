@@ -36,7 +36,7 @@ export default function Welcome({ auth }) {
             <div className="bg-gray-100 dark:bg-black text-gray-800 dark:text-white min-h-screen">
 
                 {/* NAVBAR */}
-                <header className="flex justify-between items-center px-6 py-4 bg-white dark:bg-zinc-900 shadow">
+                <header className="flex justify-between items-center px-4 py-4 bg-white dark:bg-zinc-900 shadow">
                     <h1 className="text-xl font-bold text-[#FF2D20]">
                         SAVA-U
                     </h1>
@@ -72,12 +72,12 @@ export default function Welcome({ auth }) {
                                     Connexion
                                 </Link>
 
-                                <Link
+                                {/* <Link
                                     href={route('register')}
                                     className="px-4 py-2 bg-[#FF2D20] text-white rounded-md"
                                 >
                                     Inscription
-                                </Link>
+                                </Link> */}
                             </>
                         )}
                     </nav>
