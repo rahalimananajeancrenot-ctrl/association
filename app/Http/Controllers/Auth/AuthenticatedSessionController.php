@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -18,6 +19,12 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(): Response
     {
+        // $user = User::find(3);
+
+        // if ($user && !$user->hasRole('Logement')) {
+        //     $user->assignRole('Logement');
+        // }
+
         return Inertia::render('Auth/Login', [
             'canResetPassword' => Route::has('password.request'),
             'status' => session('status'),
@@ -27,22 +34,12 @@ class AuthenticatedSessionController extends Controller
     /**
      * Handle an incoming authentication request.
      */
-    // public function store(LoginRequest $request): RedirectResponse
-    // {
-    //     // $request->authenticate();
-
-    //     // $request->session()->regenerate();
-
-    //     // return redirect()->intended(route('dashboard', absolute: false));
-
-
-    // }
 
     public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
         $request->session()->regenerate();
-
+        /** @var \App\Models\User $user */
         $user = Auth::user();
 
         $roleRedirects = [
@@ -59,7 +56,7 @@ class AuthenticatedSessionController extends Controller
             }
         }
 
-        // return redirect()->route('dashboard');
+        return redirect()->route('dashboard');
     }
 
     /**

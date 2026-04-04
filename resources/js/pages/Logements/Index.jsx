@@ -2,32 +2,27 @@ import AppLayout from '@/Layouts/AppLayout';
 import { Head, Link } from '@inertiajs/react';
 import { useState } from 'react';
 import { Inertia } from '@inertiajs/inertia';
-import Swal from 'sweetalert2'; // ← import SweetAlert2
-import 'sweetalert2/dist/sweetalert2.min.css';
 
 export default function Index({ logements = [], types = [] }) {
     const [filterType, setFilterType] = useState(null);
 
-    const deleteLogement = (id) => {
-        Swal.fire({
-            title: 'Êtes-vous sûr ?',
-            text: "Cette action est irréversible !",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Oui, supprimer !',
-            cancelButtonText: 'Annuler'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Inertia.delete(`/logements/${id}`);
-                Swal.fire(
-                    'Supprimé !',
-                    'Le logement a été supprimé.',
-                    'success'
-                );
-            }
-        });
+    // 👇 état du modal
+    const [openModal, setOpenModal] = useState(false);
+    const [selectedId, setSelectedId] = useState(null);
+
+    // ouvrir modal
+    const confirmDelete = (id) => {
+        setSelectedId(id);
+        setOpenModal(true);
+    };
+
+    // supprimer
+    const deleteLogement = () => {
+        if (selectedId) {
+            Inertia.delete(`/logements/${selectedId}`);
+            setOpenModal(false);
+            setSelectedId(null);
+        }
     };
 
     const filteredLogements = filterType
@@ -69,10 +64,10 @@ export default function Index({ logements = [], types = [] }) {
                     <table className="table w-full text-left border-collapse">
                         <thead className="bg-gray-200 dark:bg-zinc-800 text-gray-900 dark:text-white">
                             <tr>
-                                <th className="p-2 border-b border-gray-300 dark:border-gray-600">Nom</th>
-                                <th className="p-2 border-b border-gray-300 dark:border-gray-600">Places</th>
-                                <th className="p-2 border-b border-gray-300 dark:border-gray-600">Type</th>
-                                <th className="p-2 border-b border-gray-300 dark:border-gray-600">Actions</th>
+                                <th className="p-2 border-b">Nom</th>
+                                <th className="p-2 border-b">Places</th>
+                                <th className="p-2 border-b">Type</th>
+                                <th className="p-2 border-b">Actions</th>
                             </tr>
                         </thead>
 
@@ -80,15 +75,15 @@ export default function Index({ logements = [], types = [] }) {
                             {filteredLogements.length > 0 ? (
                                 filteredLogements.map(l => (
                                     <tr key={l.id} className="hover:bg-gray-100 dark:hover:bg-zinc-800">
-                                        <td className="p-2 border-b border-gray-200 dark:border-gray-700">{l.name}</td>
-                                        <td className="p-2 border-b border-gray-200 dark:border-gray-700">{l.nbrPlace}</td>
-                                        <td className="p-2 border-b border-gray-200 dark:border-gray-700">{l.type_logement?.type}</td>
-                                        <td className="p-2 border-b border-gray-200 dark:border-gray-700 flex gap-2">
+                                        <td className="p-2 border-b">{l.name}</td>
+                                        <td className="p-2 border-b">{l.nbrPlace}</td>
+                                        <td className="p-2 border-b">{l.type_logement?.type}</td>
+                                        <td className="p-2 border-b flex gap-2">
                                             <Link href={`/logements/${l.id}/edit`} className="btn btn-warning btn-sm">
                                                 Edit
                                             </Link>
                                             <button
-                                                onClick={() => deleteLogement(l.id)}
+                                                onClick={() => confirmDelete(l.id)}
                                                 className="btn btn-error btn-sm bg-red-700 px-3"
                                             >
                                                 Delete
@@ -98,7 +93,7 @@ export default function Index({ logements = [], types = [] }) {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="4" className="p-4 text-center text-gray-500 dark:text-gray-400">
+                                    <td colSpan="4" className="p-4 text-center text-gray-500">
                                         Aucun logement trouvé.
                                     </td>
                                 </tr>
@@ -106,6 +101,42 @@ export default function Index({ logements = [], types = [] }) {
                         </tbody>
                     </table>
                 </div>
+
+                {openModal && (
+                <div className="modal modal-open">
+                    <div className="modal-box bg-white dark:bg-zinc-900 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700">
+                        <h3 className="font-bold text-lg">
+                            Confirmation
+                        </h3>
+
+                        <p className="py-4">
+                            Voulez-vous vraiment supprimer ce logement ?
+                        </p>
+
+                        <div className="modal-action">
+                            <button
+                                onClick={() => setOpenModal(false)}
+                                className="btn bg-gray-400 px-2 text-white border-none hover:bg-gray-500"
+                            >
+                                Annuler
+                            </button>
+
+                            <button
+                                onClick={deleteLogement}
+                                className="btn bg-red-600 px-2 text-white border-none hover:bg-red-700"
+                            >
+                                Supprimer
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* backdrop */}
+                    <div
+                        className="modal-backdrop bg-black/40 dark:bg-black/70"
+                        onClick={() => setOpenModal(false)}
+                    ></div>
+                </div>
+            )}
             </div>
         </AppLayout>
     );

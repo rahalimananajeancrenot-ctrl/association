@@ -50,7 +50,7 @@ export default function Edit({ logement, types }) {
                         ))}
                     </select>
 
-                    <button className="btn btn-warning px-3">Modifier</button>
+                    <button className="btn btn-warning px-3 bg-blue-700 text-white w-full">Modifier</button>
 
                 </form>
             </div>

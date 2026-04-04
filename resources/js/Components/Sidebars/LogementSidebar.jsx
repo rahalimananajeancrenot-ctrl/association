@@ -54,7 +54,10 @@ export default function LogementSidebar() {
 
             </ul>
 
-            <div className="text-sm text-center border-t border-base-300 pt-3 text-base-content transition-colors duration-300">
+            <div className="text-sm text-center border-t pt-3 transition-colors duration-300 
+                border-gray-300 dark:border-gray-700 
+                text-gray-700 dark:text-gray-200"
+            >
                 Gestion des logements
             </div>
         </div>

@@ -19,11 +19,11 @@ return new class extends Migration
             $table->string('contact');
             $table->string('image')->nullable();
             $table->string('email')->unique();
-            $table->foreignId('etablissement_id')->constrained('etablissements')->onDelete('cascade');
+            $table->foreignId('etablissement_id')->constrained('etablissements')->onDelete('');
             $table->foreignId('classe_id')->constrained('classes')->onDelete('cascade');
             $table->foreignId('niveau_id')->constrained('niveaux')->onDelete('cascade');
             $table->foreignId('entite_id')->constrained('entites')->onDelete('cascade');
-            $table->foreignId('logement_id')->constrained('logements')->onDelete('cascade');
+            //$table->foreignId('logement_id')->constrained('logements')->onDelete('cascade');
             //$table->foreignId('ressource_financiere_id')->constrained('ressource_financieres')->onDelete('cascade');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');

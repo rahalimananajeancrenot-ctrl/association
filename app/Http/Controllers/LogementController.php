@@ -9,6 +9,33 @@ use Inertia\Inertia;
 
 class LogementController extends Controller
 {
+
+    public function dashboard()
+    {
+        $logements = Logement::with(['type_logement', 'users'])->get();
+
+        $totalLogements = $logements->count();
+        $totalPlaces = $logements->sum('nbrPlace');
+
+        // 🔥 calcul réel avec ta relation EXISTANTE
+        $totalOccupes = $logements->sum(function ($logement) {
+            return $logement->users->count();
+        });
+
+        $totalDisponibles = $totalPlaces - $totalOccupes;
+
+        return Inertia::render('Logements/Dashboard', [
+            'logements' => $logements,
+            'types' => Type_logement::all(),
+            'stats' => [
+                'totalLogements' => $totalLogements,
+                'totalPlaces' => $totalPlaces,
+                'occupes' => $totalOccupes,
+                'disponibles' => $totalDisponibles,
+            ]
+        ]);
+    }
+
     public function index()
     {
         $logements = Logement::with('type_logement')->latest()->get();
