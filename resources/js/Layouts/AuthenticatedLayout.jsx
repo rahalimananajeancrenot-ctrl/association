@@ -54,14 +54,16 @@ export default function AuthenticatedLayout({ header, children }) {
                                 </Link>
                             </div>
 
-                            <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                <NavLink
-                                    href={route('dashboard')}
-                                    active={route().current('dashboard')}
-                                >
-                                    Dashboard
-                                </NavLink>
-                            </div>
+                            {user.role !== 'membre' && (
+                                <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                                    <NavLink
+                                        href={route('dashboard')}
+                                        active={route().current('dashboard')}
+                                    >
+                                        Dashboard
+                                    </NavLink>
+                                </div>
+                            )}
                         </div>
 
                         {/* RIGHT */}
@@ -88,7 +90,17 @@ export default function AuthenticatedLayout({ header, children }) {
                                                 type="button"
                                                 className="inline-flex items-center rounded-md border border-transparent bg-white dark:bg-zinc-900 px-3 py-2 text-sm font-medium leading-4 text-gray-500 dark:text-gray-300 hover:text-gray-700 focus:outline-none"
                                             >
-                                                {user.name}
+                                                {user.image ? (
+                                                    <img
+                                                        src={user.image ? `/storage/${user.image}` : ''}
+                                                        alt={user.name}
+                                                        className="w-10 h-10 rounded-full object-cover"
+                                                    />
+                                                ) : (
+                                                    <span className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-gray-500">
+                                                        {user.name.charAt(0)}
+                                                    </span>
+                                                )}
 
                                                 <svg
                                                     className="-me-0.5 ms-2 h-4 w-4"
@@ -108,7 +120,7 @@ export default function AuthenticatedLayout({ header, children }) {
 
                                     <Dropdown.Content>
                                         <Dropdown.Link href={route('profile.edit')}>
-                                            Profile
+                                            Compte utilisateur
                                         </Dropdown.Link>
                                         <Dropdown.Link
                                             href={route('logout')}

@@ -75,6 +75,7 @@ class LogementController extends Controller
         ]);
     }
 
+
     public function update(Request $request, Logement $logement)
     {
         $request->validate([

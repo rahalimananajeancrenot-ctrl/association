@@ -67,8 +67,8 @@ class RegisteredUserController extends Controller
             'logement_id' => $request->logement_id,
         ]);
 
-        // Attribution automatique d’un rôle
-        //$user->assignRole('Membre');
+        //Attribution automatique d’un rôle
+        $user->assignRole('Membre');
 
         event(new Registered($user));
 
