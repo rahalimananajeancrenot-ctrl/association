@@ -14,17 +14,6 @@ use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
-    /**
-     * Display the user's profile form.
-     */
-    // public function edit(Request $request): Response
-    // {
-    //     return Inertia::render('Profile/Edit', [
-    //         'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
-    //         'status' => session('status'),
-    //     ]);
-    // }
-
     public function edit(Request $request): Response
     {
         $user = $request->user()->load('logement'); // ✅ charge la relation

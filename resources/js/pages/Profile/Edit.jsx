@@ -97,9 +97,7 @@ export default function Edit({ mustVerifyEmail, status }) {
                     </div>
 
                     {/* 🔹 MODIFICATION INFOS */}
-                    <div className="bg-white dark:bg-zinc-900 p-6 rounded-xl shadow border border-gray-200 dark:border-gray-700">
-                        <h3 className="font-semibold">Modifier mes informations</h3>
-
+                    <div className="bg-white dark:bg-zinc-900 p-4 rounded-xl shadow border border-gray-200 dark:border-gray-700">
                         <UpdateProfileInformationForm
                             mustVerifyEmail={mustVerifyEmail}
                             status={status}
@@ -107,9 +105,8 @@ export default function Edit({ mustVerifyEmail, status }) {
                     </div>
 
                     {/* 🔹 MOT DE PASSE */}
-                    <div className="bg-white dark:bg-zinc-900 p-6 rounded-xl shadow border border-gray-200 dark:border-gray-700">
+                    <div className="bg-white dark:bg-zinc-900 p-4 rounded-xl shadow border border-gray-200 dark:border-gray-700">
                         <h3 className="font-semibold">Mot de passe</h3>
-
                         <UpdatePasswordForm />
                     </div>
 

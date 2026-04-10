@@ -43,15 +43,16 @@ export default function LogementSidebar() {
 
                 {/* Attributions */}
                 <li>
-                    <a
-                        href="#"
-                        className="flex items-center gap-3 px-3 py-2 opacity-50 cursor-not-allowed transition-colors duration-300"
+                    <Link
+                        href={route('attributions.index')}
+                        className={linkClass(
+                            route().current('attributions.index') || route().current('attributions.create')
+                        )}
                     >
                         <CheckCircle size={18} />
                         Gérer attributions
-                    </a>
+                    </Link>
                 </li>
-
             </ul>
 
             <div className="text-sm text-center border-t pt-3 transition-colors duration-300 

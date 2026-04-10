@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AttributionController;
 use App\Http\Controllers\LogementController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
@@ -29,10 +30,17 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'role:Logement'])->group(function () {
     Route::resource('logements', LogementController::class);
 
-    // Route::get('/logement/dashboard', function () {
-    //     return Inertia::render('Logements/Dashboard');
-    // })->name('dashboard.logements');
+    Route::get('/attributions', [AttributionController::class, 'index'])
+    ->name('attributions.index');
 
+    Route::post('/attributions', [AttributionController::class, 'store']);
+
+        Route::get('/attributions/create', [AttributionController::class, 'create'])
+        ->name('attributions.create');
+
+        Route::post('/attributions', [AttributionController::class, 'store'])
+        ->name('attributions.store'); //
+        
     Route::get('/logement/dashboard', [LogementController::class, 'dashboard'])
     ->name('dashboard.logements');
 });
