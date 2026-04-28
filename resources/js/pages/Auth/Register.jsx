@@ -180,7 +180,7 @@ export default function Register({ etablissements, entites, logements }) {
                             className="mt-1 block w-full border-gray-300 rounded-md bg-white text-gray-900 dark:bg-gray-800 dark:text-white"
                             required
                         >
-                            <option value="">-- Choisir une entité --</option>
+                            <option value="">-- Choisir une sous-entité --</option>
                             {entites.map((entite) => (
                                 <option key={entite.id} value={entite.id}>
                                     {entite.entite}
