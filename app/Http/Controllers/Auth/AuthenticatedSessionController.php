@@ -19,10 +19,10 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(): Response
     {
-        // $user = User::find(3);
+        // $user = User::find(6);
 
-        // if ($user && !$user->hasRole('Logement')) {
-        //     $user->assignRole('Logement');
+        // if ($user && !$user->hasRole('President')) {
+        //     $user->assignRole('President');
         // }
 
         return Inertia::render('Auth/Login', [
@@ -55,6 +55,14 @@ class AuthenticatedSessionController extends Controller
                 return redirect()->route($roleRedirects[$role]);
             }
         }
+
+        // if ($user->hasRole('President')) {
+        //     return redirect()->route('president.dashboard');
+        // }
+
+        // if ($user->hasRole('Logement')) {
+        //     return redirect()->route('dashboard.logements');
+        // }
 
         return redirect()->route('dashboard');
     }
