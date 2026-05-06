@@ -2,7 +2,7 @@ import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
-import GuestLayout from '@/Layouts/GuestLayout';
+import AppLayout from '@/Layouts/AppLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 
 export default function Register({ etablissements, entites, logements }) {
@@ -23,7 +23,7 @@ export default function Register({ etablissements, entites, logements }) {
 
     const submit = (e) => {
         e.preventDefault();
-        post(route('register'), {
+        post(route('president.membres.registered'), {
             onFinish: () => reset('password', 'password_confirmation'),
         });
     };
@@ -43,9 +43,9 @@ export default function Register({ etablissements, entites, logements }) {
     const currentClasses = data.niveau_id ? classesByNiveauId[data.niveau_id] || [] : [];
 
     return (
-        <GuestLayout>
+        <AppLayout header={<h2 className="text-xl font-semibold">Ajouter un nouveau membre</h2>}>
             <Head title="Register" />
-            <form onSubmit={submit} className="space-y-4">
+            <form onSubmit={submit} className="space-y-4 space-x-4-6">
                 <h1 className='text-center text-3xl'>Ajouter un nouveau membre</h1>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Name */}
@@ -239,18 +239,18 @@ export default function Register({ etablissements, entites, logements }) {
                 </div>
 
                 <div className="mt-6 flex items-center justify-end">
-                    <Link
+                    {/* <Link
                         href={route('login')}
                         className="text-sm underline"
                     >
                         Déjà inscrit ?
-                    </Link>
+                    </Link> */}
 
                     <PrimaryButton className="ms-4 bg-emerald-700 px-2" disabled={processing}>
                         Enregistrer un nouveau membre
                     </PrimaryButton>
                 </div>
             </form>
-        </GuestLayout>
+        </AppLayout>
     );
 }

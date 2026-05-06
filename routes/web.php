@@ -4,6 +4,7 @@ use App\Http\Controllers\AttributionController;
 use App\Http\Controllers\LogementController;
 use App\Http\Controllers\PresidentController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Auth\RegisteredUserController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -54,6 +55,11 @@ Route::middleware(['auth', 'role:President'])
         // ✅ FIX : route DELETE ajoutée pour la suppression d'un membre
         Route::delete('/membres/{membre}', [PresidentController::class, 'destroy'])
             ->name('membres.destroy');
+
+        Route::get('register', [RegisteredUserController::class, 'create'])
+        ->name('membres.register');
+
+        Route::post('register', [RegisteredUserController::class, 'store'])->name('membres.registered');
     });
 
 require __DIR__.'/auth.php';

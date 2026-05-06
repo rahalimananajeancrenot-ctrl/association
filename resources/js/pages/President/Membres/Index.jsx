@@ -98,7 +98,7 @@ export default function Index({
                     <h2 className="text-xl font-semibold">
                         Gestion des membres
                     </h2>
-                    <Link href={route('register')} className="btn btn-primary">
+                    <Link href={route('president.membres.register')} className="btn btn-primary">
                         Ajouter un membre
                     </Link>
                 </div>
@@ -200,22 +200,22 @@ export default function Index({
                 {/* TABLE */}
                 <div className="p-5 rounded-2xl shadow bg-white dark:bg-zinc-900">
                     <table className="table w-full">
-                        <thead>
+                        <thead className="bg-gray-200 dark:bg-zinc-800 text-gray-700 dark:text-gray-200">
                             <tr>
-                                <th>Nom</th>
-                                <th>Email</th>
-                                <th>Entité</th>
-                                <th>Établissement</th>
-                                <th>Niveau</th>
-                                <th>Classe</th>
-                                <th>Actions</th>
+                                <th className="px-4 py-2 text-left">Nom</th>
+                                <th className="px-4 py-2 text-left">Email</th>
+                                <th className="px-4 py-2 text-left">Entité</th>
+                                <th className="px-4 py-2 text-left">Établissement</th>
+                                <th className="px-4 py-2 text-left">Niveau</th>
+                                <th className="px-4 py-2 text-left">Classe</th>
+                                <th className="px-4 py-2 text-left">Actions</th>
                             </tr>
                         </thead>
 
                         <tbody>
                             {membres.data.length === 0 ? (
                                 <tr>
-                                    <td colSpan={7} className="text-center py-6 text-gray-400">
+                                    <td colSpan={7} className="text-center py-6">
                                         Aucun membre trouvé.
                                     </td>
                                 </tr>

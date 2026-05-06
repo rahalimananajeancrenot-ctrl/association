@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { Home, Users } from 'lucide-react';
+import { Home, User2 } from 'lucide-react';
 
 export default function PresidentSidebar() {
 
@@ -34,10 +34,10 @@ export default function PresidentSidebar() {
                 <li>
                     <Link
                         href={route('president.membres.index')}
-                        className={linkClass(isActive('president.membres.index'))}
+                        className={linkClass(isActive('president.membres.*'))}
                     >
-                        <Users size={18} />
-                        Membres
+                        <User2 size={18} />
+                        Gestion des membres
                     </Link>
                 </li>
                 {/* <li>

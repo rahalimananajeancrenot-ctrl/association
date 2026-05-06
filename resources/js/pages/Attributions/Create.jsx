@@ -61,7 +61,7 @@ export default function Create({ etudiants = [], logements = [] }) {
 
     return (
         <AppLayout header={<h2 className="text-xl font-semibold dark:text-white">Attribution avancée</h2>}>
-            <Head title="Attribution avancée" />
+            <Head title="Attribution des logements" />
             <form onSubmit={handleSubmit} className="">
             <div className="p-6 grid grid-cols-3 gap-6">
 

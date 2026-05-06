@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Spatie\Permission\Models\Role;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -24,6 +25,9 @@ class AuthenticatedSessionController extends Controller
         // if ($user && !$user->hasRole('President')) {
         //     $user->assignRole('President');
         // }
+
+        Role::firstOrCreate(['name' => 'Enseignant']);
+        Role::firstOrCreate(['name' => 'Eleve']);
 
         return Inertia::render('Auth/Login', [
             'canResetPassword' => Route::has('password.request'),

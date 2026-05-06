@@ -1,5 +1,5 @@
 import AppLayout from '@/Layouts/AppLayout';
-import { Link } from '@inertiajs/react';
+import {Head, Link } from '@inertiajs/react';
 
 export default function Index({ attributions = [] }) {
     return (
@@ -20,6 +20,7 @@ export default function Index({ attributions = [] }) {
                 </div>
             }
         >
+            <Head title="Voir les attributions" />
             
             <div className="p-6 bg-white dark:bg-zinc-900 rounded shadow border border-gray-200 dark:border-gray-700">
                 <h2 className="text-xl font-bold mb-4">Attributions</h2>
