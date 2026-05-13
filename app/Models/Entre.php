@@ -15,7 +15,12 @@ class Entre extends Model
 
      public function ressource_financiere()
     {
-        return $this->belongsTo(Ressource_financier::class);
+        return $this->belongsTo(Ressource_financiere::class);
+    }
+
+    public function caisse()
+    {
+        return $this->belongsTo(Caisse::class);
     }
 
 }

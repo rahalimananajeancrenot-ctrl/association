@@ -8,6 +8,8 @@ class Ressource_financiere extends Model
 {
     protected $fillable = [
         'ressource',
+        'montant',
+        'annee',
     ];
 
      public function entre()

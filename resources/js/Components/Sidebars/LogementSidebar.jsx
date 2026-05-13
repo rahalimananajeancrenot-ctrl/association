@@ -1,64 +1,67 @@
 import { Link } from '@inertiajs/react';
-import { Home, Building2, CheckCircle } from 'lucide-react';
+import { Home, Building2, CheckCircle, BedDouble } from 'lucide-react';
 
 export default function LogementSidebar() {
-
     const isActive = (name) => route().current(name);
 
     const linkClass = (active) =>
         active
-            ? 'flex items-center gap-3 bg-primary text-primary-content px-3 py-2 rounded transition-colors duration-300'
-            : 'flex items-center gap-3 px-3 py-2 rounded hover:bg-blue-300 hover:text-base-content transition-colors duration-300';
+            ? 'flex items-center gap-3 rounded-2xl bg-blue-600 px-4 py-3 font-bold text-white shadow-lg shadow-blue-600/20'
+            : 'flex items-center gap-3 rounded-2xl px-4 py-3 font-semibold text-gray-600 transition hover:bg-blue-50 hover:text-blue-700 dark:text-gray-300 dark:hover:bg-blue-500/10 dark:hover:text-blue-300';
 
     return (
-        <div className="p-4 flex flex-col min-h-screen transition-colors duration-300">
+        <div className="flex h-full flex-col p-4">
+            <div className="mb-8 flex items-center gap-3 rounded-3xl bg-blue-50 p-4 dark:bg-blue-500/10">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-600 text-white">
+                    <BedDouble size={24} />
+                </div>
 
-            <h2 className="text-center font-bold mb-6 transition-colors duration-300">
-                Commission Logement
-            </h2>
+                <div>
+                    <h2 className="font-black text-gray-900 dark:text-white">
+                        Logement
+                    </h2>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                        Commission logement
+                    </p>
+                </div>
+            </div>
 
-            <ul className="space-y-2 flex-1">
-
-                {/* Dashboard */}
+            <ul className="flex-1 space-y-2">
                 <li>
                     <Link
                         href={route('dashboard.logements')}
                         className={linkClass(isActive('dashboard.logements'))}
                     >
-                        <Home size={18} />
+                        <Home size={20} />
                         Dashboard
                     </Link>
                 </li>
 
-                {/* Logements */}
                 <li>
                     <Link
                         href={route('logements.index')}
                         className={linkClass(isActive('logements.*'))}
                     >
-                        <Building2 size={18} />
+                        <Building2 size={20} />
                         Gérer logements
                     </Link>
                 </li>
 
-                {/* Attributions */}
                 <li>
                     <Link
                         href={route('attributions.index')}
                         className={linkClass(
-                            route().current('attributions.index') || route().current('attributions.create')
+                            isActive('attributions.index') ||
+                            isActive('attributions.create')
                         )}
                     >
-                        <CheckCircle size={18} />
+                        <CheckCircle size={20} />
                         Gérer attributions
                     </Link>
                 </li>
             </ul>
 
-            <div className="text-sm text-center border-t pt-3 transition-colors duration-300 
-                border-gray-300 dark:border-gray-700 
-                text-gray-700 dark:text-gray-200"
-            >
+            <div className="border-t border-gray-200 pt-4 text-center text-sm font-semibold text-gray-500 dark:border-zinc-800 dark:text-gray-400">
                 Gestion des logements
             </div>
         </div>

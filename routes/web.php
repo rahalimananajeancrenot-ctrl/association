@@ -4,12 +4,27 @@ use App\Http\Controllers\AttributionController;
 use App\Http\Controllers\LogementController;
 use App\Http\Controllers\PresidentController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Tresorier\TresorierController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Models\User;
+use Spatie\Permission\Models\Role;
 
 Route::get('/', function () {
+
+    // $user = User::find(7);
+
+    // if ($user && !$user->hasRole('Tresorier')) {
+
+    //     $role = Role::firstOrCreate([
+    //         'name' => 'Tresorier'
+    //     ]);
+
+    //     $user->assignRole($role);
+    // }
+
     return Inertia::render('Welcome', [
         'canLogin'       => Route::has('login'),
         'canRegister'    => Route::has('register'),
@@ -62,4 +77,26 @@ Route::middleware(['auth', 'role:President'])
         Route::post('register', [RegisteredUserController::class, 'store'])->name('membres.registered');
     });
 
+   Route::middleware(['auth', 'role:Tresorier'])
+    ->prefix('tresorier')
+    ->name('tresorier.')
+    ->group(function () {
+        Route::get('/dashboard', [TresorierController::class, 'dashboard'])
+            ->name('dashboard');
+
+        Route::get('/finances', [TresorierController::class, 'finances'])
+            ->name('finances.index');
+
+        Route::get('/rapports', [TresorierController::class, 'rapports'])
+            ->name('rapports.index');
+
+        Route::post('/entres', [TresorierController::class, 'storeEntre'])
+            ->name('entres.store');
+
+        Route::post('/sorties', [TresorierController::class, 'storeSortie'])
+            ->name('sorties.store');
+
+        Route::post('/ressources', [TresorierController::class, 'storeRessource'])
+            ->name('ressources.store');
+    });
 require __DIR__.'/auth.php';

@@ -81,7 +81,7 @@ export default function GuestLayout({ children, auth }) {
 
             {/* CONTENU */}
             <div className="flex flex-col items-center pt-6">
-                <div className="mt-6 mb-6 w-full max-w-4xl bg-white dark:bg-zinc-900 px-6 py-4 shadow-md rounded-lg">
+                <div className="mt-6 mb-6 w-full max-w-4xl px-6 py-4 shadow-md rounded-lg">
                     {children}
                 </div>
             </div>

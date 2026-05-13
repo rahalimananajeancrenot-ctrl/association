@@ -11,6 +11,9 @@ class Sortie extends Model
         'description',
         'caisse_id'
     ];
-
+    public function caisse()
+    {
+        return $this->belongsTo(Caisse::class);
+    }
 
 }
