@@ -1,6 +1,17 @@
 import { useState, useMemo } from 'react';
 import { useForm, Head } from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
+import {
+    X,
+    Search,
+    User,
+    Wallet,
+    FileText,
+    PlusCircle,
+    MinusCircle,
+    Coins,
+    Calendar,
+} from 'lucide-react';
 
 export default function Finances({
     entrees = [],
@@ -13,6 +24,9 @@ export default function Finances({
     const [openSortie, setOpenSortie] = useState(false);
     const [openRessource, setOpenRessource] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
+
+    const [userSearch, setUserSearch] = useState('');
+    const [selectedUserName, setSelectedUserName] = useState('');
 
     const itemsPerPage = 10;
 
@@ -34,6 +48,14 @@ export default function Finances({
         montant: '',
         annee: new Date().getFullYear(),
     });
+
+    const filteredUsers = useMemo(() => {
+        if (!userSearch.trim()) return users;
+
+        return users.filter((user) =>
+            user.name?.toLowerCase().includes(userSearch.toLowerCase())
+        );
+    }, [users, userSearch]);
 
     const operations = useMemo(() => {
         const all = [
@@ -66,13 +88,47 @@ export default function Finances({
         return totalEntrees - totalSorties;
     }, [entrees, sorties]);
 
+    const closeEntreeModal = () => {
+        setOpenEntree(false);
+        setUserSearch('');
+        setSelectedUserName('');
+        entreeForm.reset();
+    };
+
+    const closeSortieModal = () => {
+        setOpenSortie(false);
+        sortieForm.reset();
+    };
+
+    const closeRessourceModal = () => {
+        setOpenRessource(false);
+        ressourceForm.reset();
+    };
+
+    const handleSelectUser = (user) => {
+        entreeForm.setData('user_id', user.id);
+        setSelectedUserName(user.name);
+        setUserSearch(user.name);
+    };
+
+    const handleSelectRessource = (ressourceId) => {
+        const selectedRessource = ressources.find(
+            (ressource) => String(ressource.id) === String(ressourceId)
+        );
+
+        entreeForm.setData({
+            ...entreeForm.data,
+            ressource_financiere_id: ressourceId,
+            montant: selectedRessource ? selectedRessource.montant : '',
+        });
+    };
+
     const submitEntree = (e) => {
         e.preventDefault();
 
         entreeForm.post(route('tresorier.entres.store'), {
             onSuccess: () => {
-                setOpenEntree(false);
-                entreeForm.reset();
+                closeEntreeModal();
             },
         });
     };
@@ -82,8 +138,7 @@ export default function Finances({
 
         sortieForm.post(route('tresorier.sorties.store'), {
             onSuccess: () => {
-                setOpenSortie(false);
-                sortieForm.reset();
+                closeSortieModal();
             },
         });
     };
@@ -93,8 +148,7 @@ export default function Finances({
 
         ressourceForm.post(route('tresorier.ressources.store'), {
             onSuccess: () => {
-                setOpenRessource(false);
-                ressourceForm.reset();
+                closeRessourceModal();
             },
         });
     };
@@ -176,23 +230,26 @@ export default function Finances({
                         <div className="flex flex-wrap gap-2">
                             <button
                                 onClick={() => setOpenEntree(true)}
-                                className="rounded-lg bg-green-600 px-4 py-2 font-semibold text-white hover:bg-green-700"
+                                className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 font-semibold text-white hover:bg-green-700"
                             >
-                                + Entrée
+                                <PlusCircle size={18} />
+                                Entrée
                             </button>
 
                             <button
                                 onClick={() => setOpenSortie(true)}
-                                className="rounded-lg bg-red-600 px-4 py-2 font-semibold text-white hover:bg-red-700"
+                                className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 font-semibold text-white hover:bg-red-700"
                             >
-                                + Sortie
+                                <MinusCircle size={18} />
+                                Sortie
                             </button>
 
                             <button
                                 onClick={() => setOpenRessource(true)}
-                                className="rounded-lg bg-amber-600 px-4 py-2 font-semibold text-white hover:bg-amber-700"
+                                className="inline-flex items-center gap-2 rounded-lg bg-amber-600 px-4 py-2 font-semibold text-white hover:bg-amber-700"
                             >
-                                + Ressource
+                                <Coins size={18} />
+                                Ressource
                             </button>
                         </div>
                     </div>
@@ -249,73 +306,173 @@ export default function Finances({
             </div>
 
             {openEntree && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-                    <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl dark:bg-zinc-950">
-                        <h2 className="mb-4 text-lg font-bold text-gray-900 dark:text-white">
-                            Ajouter une entrée
-                        </h2>
+                <div className="fixed inset-0 z-[9999] overflow-y-auto bg-black/60 p-4 pt-10 pb-10 backdrop-blur-sm">
+                    <div className="relative mx-auto my-8 w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl dark:bg-zinc-950">
+                        <button
+                            type="button"
+                            onClick={closeEntreeModal}
+                            className="absolute right-4 top-4 rounded-full bg-gray-100 p-2 text-gray-600 transition hover:bg-red-100 hover:text-red-600 dark:bg-zinc-800 dark:text-gray-300 dark:hover:bg-red-950 dark:hover:text-red-300"
+                        >
+                            <X size={20} />
+                        </button>
 
-                        <form onSubmit={submitEntree} className="space-y-3">
-                            <select
-                                className="w-full rounded-lg border border-gray-300 bg-white p-3 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white"
-                                value={entreeForm.data.user_id}
-                                onChange={(e) => entreeForm.setData('user_id', e.target.value)}
-                                required
-                            >
-                                <option value="">Choisir un membre</option>
-                                {users.map((u) => (
-                                    <option key={u.id} value={u.id}>
-                                        {u.name}
-                                    </option>
-                                ))}
-                            </select>
+                        <div className="mb-5">
+                            <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300">
+                                <PlusCircle size={26} />
+                            </div>
 
-                            <select
-                                className="w-full rounded-lg border border-gray-300 bg-white p-3 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white"
-                                value={entreeForm.data.ressource_financiere_id}
-                                onChange={(e) =>
-                                    entreeForm.setData('ressource_financiere_id', e.target.value)
-                                }
-                                required
-                            >
-                                <option value="">Choisir une ressource</option>
-                                {ressources.map((r) => (
-                                    <option key={r.id} value={r.id}>
-                                        {r.ressource}
-                                    </option>
-                                ))}
-                            </select>
+                            <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                                Ajouter une entrée
+                            </h2>
 
-                            <input
-                                type="number"
-                                placeholder="Montant"
-                                className="w-full rounded-lg border border-gray-300 bg-white p-3 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white"
-                                value={entreeForm.data.montant}
-                                onChange={(e) => entreeForm.setData('montant', e.target.value)}
-                                required
-                            />
+                            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                                Recherchez un membre, choisissez une ressource et le montant sera rempli automatiquement.
+                            </p>
+                        </div>
 
-                            <input
-                                type="text"
-                                placeholder="Description"
-                                className="w-full rounded-lg border border-gray-300 bg-white p-3 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white"
-                                value={entreeForm.data.description}
-                                onChange={(e) => entreeForm.setData('description', e.target.value)}
-                            />
+                        <form onSubmit={submitEntree} className="space-y-4">
+                            <div>
+                                <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300">
+                                    Membre
+                                </label>
+
+                                <div className="relative">
+                                    <Search
+                                        size={18}
+                                        className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                                    />
+
+                                    <input
+                                        type="text"
+                                        placeholder="Rechercher un membre par son nom..."
+                                        className="w-full rounded-xl border border-gray-300 bg-white p-3 pl-10 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white"
+                                        value={userSearch}
+                                        onChange={(e) => {
+                                            setUserSearch(e.target.value);
+                                            setSelectedUserName('');
+                                            entreeForm.setData('user_id', '');
+                                        }}
+                                        required
+                                    />
+                                </div>
+
+                                {userSearch && !selectedUserName && (
+                                    <div className="mt-2 max-h-48 overflow-y-auto rounded-xl border border-gray-200 bg-white shadow-lg dark:border-zinc-700 dark:bg-zinc-900">
+                                        {filteredUsers.length > 0 ? (
+                                            filteredUsers.map((user) => (
+                                                <button
+                                                    key={user.id}
+                                                    type="button"
+                                                    onClick={() => handleSelectUser(user)}
+                                                    className="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-green-50 dark:hover:bg-zinc-800"
+                                                >
+                                                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300">
+                                                        <User size={18} />
+                                                    </div>
+
+                                                    <div>
+                                                        <p className="text-sm font-semibold text-gray-800 dark:text-white">
+                                                            {user.name}
+                                                        </p>
+                                                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                                                            {user.email ?? 'Aucun email'}
+                                                        </p>
+                                                    </div>
+                                                </button>
+                                            ))
+                                        ) : (
+                                            <p className="p-4 text-center text-sm text-gray-500 dark:text-gray-400">
+                                                Aucun utilisateur trouvé.
+                                            </p>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+
+                            <div>
+                                <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300">
+                                    Ressource financière
+                                </label>
+
+                                <div className="relative">
+                                    <Wallet
+                                        size={18}
+                                        className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                                    />
+
+                                    <select
+                                        className="w-full rounded-xl border border-gray-300 bg-white p-3 pl-10 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white"
+                                        value={entreeForm.data.ressource_financiere_id}
+                                        onChange={(e) => handleSelectRessource(e.target.value)}
+                                        required
+                                    >
+                                        <option value="">Choisir une ressource</option>
+                                        {ressources.map((ressource) => (
+                                            <option key={ressource.id} value={ressource.id}>
+                                                {ressource.ressource} - {ressource.montant} Ar
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300">
+                                    Montant
+                                </label>
+
+                                <div className="relative">
+                                    <Coins
+                                        size={18}
+                                        className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                                    />
+
+                                    <input
+                                        type="number"
+                                        placeholder="Montant"
+                                        className="w-full rounded-xl border border-gray-300 bg-gray-50 p-3 pl-10 font-semibold text-green-700 dark:border-zinc-700 dark:bg-zinc-900 dark:text-green-300"
+                                        value={entreeForm.data.montant}
+                                        onChange={(e) => entreeForm.setData('montant', e.target.value)}
+                                        required
+                                        readOnly
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300">
+                                    Description
+                                </label>
+
+                                <div className="relative">
+                                    <FileText
+                                        size={18}
+                                        className="absolute left-3 top-3.5 text-gray-400"
+                                    />
+
+                                    <textarea
+                                        placeholder="Description"
+                                        rows="3"
+                                        className="w-full rounded-xl border border-gray-300 bg-white p-3 pl-10 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white"
+                                        value={entreeForm.data.description}
+                                        onChange={(e) => entreeForm.setData('description', e.target.value)}
+                                    />
+                                </div>
+                            </div>
 
                             <div className="flex justify-end gap-2 pt-3">
                                 <button
                                     type="button"
-                                    onClick={() => setOpenEntree(false)}
-                                    className="rounded-lg bg-gray-100 px-4 py-2 font-semibold text-gray-700 hover:bg-gray-200 dark:bg-zinc-800 dark:text-gray-200"
+                                    onClick={closeEntreeModal}
+                                    className="rounded-xl bg-gray-100 px-4 py-2 font-semibold text-gray-700 hover:bg-gray-200 dark:bg-zinc-800 dark:text-gray-200"
                                 >
                                     Annuler
                                 </button>
 
                                 <button
                                     type="submit"
-                                    disabled={entreeForm.processing}
-                                    className="rounded-lg bg-green-600 px-4 py-2 font-semibold text-white hover:bg-green-700"
+                                    disabled={entreeForm.processing || !entreeForm.data.user_id}
+                                    className="rounded-xl bg-green-600 px-4 py-2 font-semibold text-white hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-60"
                                 >
                                     Enregistrer
                                 </button>
@@ -326,36 +483,64 @@ export default function Finances({
             )}
 
             {openSortie && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-                    <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl dark:bg-zinc-950">
-                        <h2 className="mb-4 text-lg font-bold text-gray-900 dark:text-white">
-                            Ajouter une sortie
-                        </h2>
+                <div className="fixed inset-0 z-[9999] overflow-y-auto bg-black/60 p-4 pt-10 pb-10 backdrop-blur-sm">
+                    <div className="relative mx-auto my-8 w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl dark:bg-zinc-950">
+                        <button
+                            type="button"
+                            onClick={closeSortieModal}
+                            className="absolute right-4 top-4 rounded-full bg-gray-100 p-2 text-gray-600 transition hover:bg-red-100 hover:text-red-600 dark:bg-zinc-800 dark:text-gray-300 dark:hover:bg-red-950 dark:hover:text-red-300"
+                        >
+                            <X size={20} />
+                        </button>
 
-                        <form onSubmit={submitSortie} className="space-y-3">
-                            <input
-                                type="number"
-                                placeholder="Montant"
-                                className="w-full rounded-lg border border-gray-300 bg-white p-3 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white"
-                                value={sortieForm.data.montant}
-                                onChange={(e) => sortieForm.setData('montant', e.target.value)}
-                                required
-                            />
+                        <div className="mb-5">
+                            <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300">
+                                <MinusCircle size={26} />
+                            </div>
 
-                            <input
-                                type="text"
-                                placeholder="Description"
-                                className="w-full rounded-lg border border-gray-300 bg-white p-3 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white"
-                                value={sortieForm.data.description}
-                                onChange={(e) => sortieForm.setData('description', e.target.value)}
-                                required
-                            />
+                            <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                                Ajouter une sortie
+                            </h2>
+                        </div>
+
+                        <form onSubmit={submitSortie} className="space-y-4">
+                            <div className="relative">
+                                <Coins
+                                    size={18}
+                                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                                />
+
+                                <input
+                                    type="number"
+                                    placeholder="Montant"
+                                    className="w-full rounded-xl border border-gray-300 bg-white p-3 pl-10 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white"
+                                    value={sortieForm.data.montant}
+                                    onChange={(e) => sortieForm.setData('montant', e.target.value)}
+                                    required
+                                />
+                            </div>
+
+                            <div className="relative">
+                                <FileText
+                                    size={18}
+                                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                                />
+
+                                <input
+                                    type="text"
+                                    placeholder="Description"
+                                    className="w-full rounded-xl border border-gray-300 bg-white p-3 pl-10 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white"
+                                    value={sortieForm.data.description}
+                                    onChange={(e) => sortieForm.setData('description', e.target.value)}
+                                    required
+                                />
+                            </div>
 
                             <div className="flex justify-end gap-2 pt-3">
                                 <button
                                     type="button"
-                                    onClick={() => setOpenSortie(false)}
-                                    className="rounded-lg bg-gray-100 px-4 py-2 font-semibold text-gray-700 hover:bg-gray-200 dark:bg-zinc-800 dark:text-gray-200"
+                                    onClick={closeSortieModal}
+                                    className="rounded-xl bg-gray-100 px-4 py-2 font-semibold text-gray-700 hover:bg-gray-200 dark:bg-zinc-800 dark:text-gray-200"
                                 >
                                     Annuler
                                 </button>
@@ -363,7 +548,7 @@ export default function Finances({
                                 <button
                                     type="submit"
                                     disabled={sortieForm.processing}
-                                    className="rounded-lg bg-red-600 px-4 py-2 font-semibold text-white hover:bg-red-700"
+                                    className="rounded-xl bg-red-600 px-4 py-2 font-semibold text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
                                 >
                                     Enregistrer
                                 </button>
@@ -374,45 +559,80 @@ export default function Finances({
             )}
 
             {openRessource && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-                    <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl dark:bg-zinc-950">
-                        <h2 className="mb-4 text-lg font-bold text-gray-900 dark:text-white">
-                            Ajouter une ressource
-                        </h2>
+                <div className="fixed inset-0 z-[9999] overflow-y-auto bg-black/60 p-4 pt-10 pb-10 backdrop-blur-sm">
+                    <div className="relative mx-auto my-8 w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl dark:bg-zinc-950">
+                        <button
+                            type="button"
+                            onClick={closeRessourceModal}
+                            className="absolute right-4 top-4 rounded-full bg-gray-100 p-2 text-gray-600 transition hover:bg-red-100 hover:text-red-600 dark:bg-zinc-800 dark:text-gray-300 dark:hover:bg-red-950 dark:hover:text-red-300"
+                        >
+                            <X size={20} />
+                        </button>
 
-                        <form onSubmit={submitRessource} className="space-y-3">
-                            <input
-                                type="text"
-                                placeholder="Nom de la ressource"
-                                className="w-full rounded-lg border border-gray-300 bg-white p-3 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white"
-                                value={ressourceForm.data.ressource}
-                                onChange={(e) => ressourceForm.setData('ressource', e.target.value)}
-                                required
-                            />
+                        <div className="mb-5">
+                            <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
+                                <Coins size={26} />
+                            </div>
 
-                            <input
-                                type="number"
-                                placeholder="Montant"
-                                className="w-full rounded-lg border border-gray-300 bg-white p-3 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white"
-                                value={ressourceForm.data.montant}
-                                onChange={(e) => ressourceForm.setData('montant', e.target.value)}
-                                required
-                            />
+                            <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                                Ajouter une ressource
+                            </h2>
+                        </div>
 
-                            <input
-                                type="number"
-                                placeholder="Année"
-                                className="w-full rounded-lg border border-gray-300 bg-white p-3 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white"
-                                value={ressourceForm.data.annee}
-                                onChange={(e) => ressourceForm.setData('annee', e.target.value)}
-                                required
-                            />
+                        <form onSubmit={submitRessource} className="space-y-4">
+                            <div className="relative">
+                                <Wallet
+                                    size={18}
+                                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                                />
+
+                                <input
+                                    type="text"
+                                    placeholder="Nom de la ressource"
+                                    className="w-full rounded-xl border border-gray-300 bg-white p-3 pl-10 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white"
+                                    value={ressourceForm.data.ressource}
+                                    onChange={(e) => ressourceForm.setData('ressource', e.target.value)}
+                                    required
+                                />
+                            </div>
+
+                            <div className="relative">
+                                <Coins
+                                    size={18}
+                                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                                />
+
+                                <input
+                                    type="number"
+                                    placeholder="Montant"
+                                    className="w-full rounded-xl border border-gray-300 bg-white p-3 pl-10 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white"
+                                    value={ressourceForm.data.montant}
+                                    onChange={(e) => ressourceForm.setData('montant', e.target.value)}
+                                    required
+                                />
+                            </div>
+
+                            <div className="relative">
+                                <Calendar
+                                    size={18}
+                                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                                />
+
+                                <input
+                                    type="number"
+                                    placeholder="Année"
+                                    className="w-full rounded-xl border border-gray-300 bg-white p-3 pl-10 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white"
+                                    value={ressourceForm.data.annee}
+                                    onChange={(e) => ressourceForm.setData('annee', e.target.value)}
+                                    required
+                                />
+                            </div>
 
                             <div className="flex justify-end gap-2 pt-3">
                                 <button
                                     type="button"
-                                    onClick={() => setOpenRessource(false)}
-                                    className="rounded-lg bg-gray-100 px-4 py-2 font-semibold text-gray-700 hover:bg-gray-200 dark:bg-zinc-800 dark:text-gray-200"
+                                    onClick={closeRessourceModal}
+                                    className="rounded-xl bg-gray-100 px-4 py-2 font-semibold text-gray-700 hover:bg-gray-200 dark:bg-zinc-800 dark:text-gray-200"
                                 >
                                     Annuler
                                 </button>
@@ -420,7 +640,7 @@ export default function Finances({
                                 <button
                                     type="submit"
                                     disabled={ressourceForm.processing}
-                                    className="rounded-lg bg-amber-600 px-4 py-2 font-semibold text-white hover:bg-amber-700"
+                                    className="rounded-xl bg-amber-600 px-4 py-2 font-semibold text-white hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-60"
                                 >
                                     Enregistrer
                                 </button>

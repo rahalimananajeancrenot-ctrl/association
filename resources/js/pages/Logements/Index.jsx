@@ -160,7 +160,7 @@ export default function Index({ logements = [], types = [] }) {
                                     <tr>
                                         <th className="px-6 py-4">Nom</th>
                                         <th className="px-6 py-4">Places</th>
-                                        <th className="px-6 py-4">Type</th>
+                                        <th className="px-6 py-4">Departement</th>
                                         <th className="px-6 py-4 text-right">Actions</th>
                                     </tr>
                                 </thead>

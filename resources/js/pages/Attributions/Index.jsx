@@ -10,6 +10,12 @@ import {
 } from 'lucide-react';
 
 export default function Index({ attributions = [] }) {
+    const getPdfUrl = (path) => {
+        if (!path) return '#';
+
+        return `/storage/${path}?inline=1`;
+    };
+
     return (
         <AppLayout
             header={
@@ -28,7 +34,6 @@ export default function Index({ attributions = [] }) {
             <div className="min-h-screen bg-gray-100 px-4 py-8 dark:bg-black">
                 <div className="mx-auto max-w-7xl space-y-8">
 
-                    {/* HERO */}
                     <div className="overflow-hidden rounded-[2rem] bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 p-8 text-white shadow-xl">
                         <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
                             <div>
@@ -57,7 +62,6 @@ export default function Index({ attributions = [] }) {
                         </div>
                     </div>
 
-                    {/* STATS */}
                     <div className="grid gap-5 md:grid-cols-3">
                         <StatCard
                             icon={<ClipboardList />}
@@ -87,7 +91,6 @@ export default function Index({ attributions = [] }) {
                         />
                     </div>
 
-                    {/* TABLE */}
                     <div className="overflow-hidden rounded-[2rem] border border-gray-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
                         <div className="border-b border-gray-200 p-6 dark:border-zinc-800">
                             <h3 className="text-xl font-black text-gray-900 dark:text-white">
@@ -145,7 +148,7 @@ export default function Index({ attributions = [] }) {
                                                 <td className="px-6 py-4 text-right">
                                                     {a.pdf_path ? (
                                                         <a
-                                                            href={`/storage/${a.pdf_path}`}
+                                                            href={getPdfUrl(a.pdf_path)}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
                                                             className="inline-flex items-center gap-2 rounded-xl bg-red-100 px-4 py-2 text-sm font-bold text-red-700 transition hover:bg-red-200 dark:bg-red-500/10 dark:text-red-300 dark:hover:bg-red-500/20"

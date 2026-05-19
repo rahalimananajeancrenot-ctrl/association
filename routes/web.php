@@ -33,28 +33,52 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    Route::post('/profile/photo', [ProfileController::class, 'updatePhoto']);
+// ✅ Dashboard général des membres SAVA-U
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/dashboard', [ProfileController::class, 'memberDashboard'])
+        ->name('dashboard');
+
+    Route::get('/members/{user}', [ProfileController::class, 'showMember'])
+        ->name('members.show');
 });
 
+
+// ✅ Profil utilisateur
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])
+        ->name('profile.edit');
+
+    Route::patch('/profile', [ProfileController::class, 'update'])
+        ->name('profile.update');
+
+    Route::delete('/profile', [ProfileController::class, 'destroy'])
+        ->name('profile.destroy');
+
+    Route::post('/profile/photo', [ProfileController::class, 'updatePhoto'])
+        ->name('profile.photo.update');
+});
+
+
+// ✅ Module Logement
 Route::middleware(['auth', 'role:Logement'])->group(function () {
     Route::resource('logements', LogementController::class);
 
-    // ✅ FIX : suppression de la route POST dupliquée
-    Route::get('/attributions', [AttributionController::class, 'index'])->name('attributions.index');
-    Route::get('/attributions/create', [AttributionController::class, 'create'])->name('attributions.create');
-    Route::post('/attributions', [AttributionController::class, 'store'])->name('attributions.store');
+    Route::get('/attributions', [AttributionController::class, 'index'])
+        ->name('attributions.index');
 
-    Route::get('/logement/dashboard', [LogementController::class, 'dashboard'])->name('dashboard.logements');
+    Route::get('/attributions/create', [AttributionController::class, 'create'])
+        ->name('attributions.create');
+
+    Route::post('/attributions', [AttributionController::class, 'store'])
+        ->name('attributions.store');
+
+    Route::get('/logement/dashboard', [LogementController::class, 'dashboard'])
+        ->name('dashboard.logements');
 });
 
+
+// ✅ Module Président
 Route::middleware(['auth', 'role:President'])
     ->prefix('president')
     ->name('president.')
@@ -63,24 +87,26 @@ Route::middleware(['auth', 'role:President'])
         Route::get('/dashboard', [PresidentController::class, 'dashboard'])
             ->name('dashboard');
 
-        // ✅ FIX : utilise MembreController + ajout de la route DELETE pour la suppression
         Route::get('/membres', [PresidentController::class, 'membres'])
             ->name('membres.index');
 
-        // ✅ FIX : route DELETE ajoutée pour la suppression d'un membre
         Route::delete('/membres/{membre}', [PresidentController::class, 'destroy'])
             ->name('membres.destroy');
 
-        Route::get('register', [RegisteredUserController::class, 'create'])
-        ->name('membres.register');
+        Route::get('/register', [RegisteredUserController::class, 'create'])
+            ->name('membres.register');
 
-        Route::post('register', [RegisteredUserController::class, 'store'])->name('membres.registered');
+        Route::post('/register', [RegisteredUserController::class, 'store'])
+            ->name('membres.registered');
     });
 
-   Route::middleware(['auth', 'role:Tresorier'])
+
+// ✅ Module Trésorier
+Route::middleware(['auth', 'role:Tresorier'])
     ->prefix('tresorier')
     ->name('tresorier.')
     ->group(function () {
+
         Route::get('/dashboard', [TresorierController::class, 'dashboard'])
             ->name('dashboard');
 
@@ -89,6 +115,10 @@ Route::middleware(['auth', 'role:President'])
 
         Route::get('/rapports', [TresorierController::class, 'rapports'])
             ->name('rapports.index');
+
+        // ✅ Route PDF à ajouter
+        Route::get('/rapports/pdf', [TresorierController::class, 'exportRapportPdf'])
+            ->name('rapports.pdf');
 
         Route::post('/entres', [TresorierController::class, 'storeEntre'])
             ->name('entres.store');
@@ -99,4 +129,6 @@ Route::middleware(['auth', 'role:President'])
         Route::post('/ressources', [TresorierController::class, 'storeRessource'])
             ->name('ressources.store');
     });
+
+
 require __DIR__.'/auth.php';

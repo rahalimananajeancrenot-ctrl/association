@@ -52,7 +52,7 @@ export default function TresorierSidebar() {
                         className={linkClass(isActive('tresorier.rapports.*'))}
                     >
                         <FileText size={20} />
-                        Rapports
+                        Droit annuel
                     </Link>
                 </li>
             </ul>

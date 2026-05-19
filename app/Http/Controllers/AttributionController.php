@@ -2,15 +2,7 @@
 
 namespace App\Http\Controllers;
 
-// use App\Models\User;
-// use App\Models\Logement;
-// use App\Models\Attribution;
-// use Illuminate\Http\Request;
-// use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
-// use PDF; // barryvdh/laravel-dompdf
-// use App\Notifications\AttributionNotification;
-
 use App\Models\Attribution;
 use App\Models\Logement;
 use App\Models\User;
@@ -36,95 +28,6 @@ class AttributionController extends Controller
             'attributions' => $attributions
         ]);
     }
-
-    // public function store(Request $request)
-    // {
-    //     $request->validate([
-    //         'attributions' => 'required|array',
-    //     ]);
-
-    //     foreach ($request->attributions as $attr) {
-
-    //         $users = User::whereIn('id', $attr['user_ids'])->get();
-    //         $logement = Logement::findOrFail($attr['logement_id']);
-
-    //         // ✅ update users
-    //         foreach ($users as $user) {
-    //             $user->update([
-    //                 'logement_id' => $logement->id
-    //             ]);
-    //         }
-
-    //         // 📄 PDF par groupe
-    //         $pdf = PDF::loadView('pdf.attribution', [
-    //             'users' => $users,
-    //             'logement' => $logement
-    //         ]);
-
-    //         $fileName = 'attributions/' . time() . '_' . $logement->id . '.pdf';
-
-    //         Storage::disk('public')->put($fileName, $pdf->output());
-
-    //         // 💾 historique
-    //         Attribution::create([
-    //             'logement_id' => $logement->id,
-    //             'user_ids' => json_encode($attr['user_ids']),
-    //             'pdf_path' => $fileName
-    //         ]);
-
-    //         // 🔔 notifications
-    //         foreach ($users as $user) {
-    //             $user->notify(new \App\Notifications\AttributionNotification($logement));
-    //         }
-    //     }
-
-    //     return back()->with('success', 'Attributions multiples effectuées');
-    // }
-
-    // public function store(Request $request)
-    // {
-    //     foreach ($request->input('attributions', []) as $attr) {
-    //         $logement = Logement::find($attr['logement_id']);
-    //         if (!$logement) continue;
-
-    //         $users = [];
-    //         foreach ($attr['user_ids'] as $user_id) {
-    //             $user = User::find($user_id);
-    //             if ($user) {
-    //                 $user->logement_id = $logement->id;
-    //                 $user->save();
-    //                 $users[] = $user;
-    //             }
-    //         }
-
-    //         // 📄 Générer le PDF
-    //         // $pdf = PDF::loadView('pdf.attribution', [
-    //         //     'users' => $users,
-    //         //     'logement' => $logement
-    //         // ]);
-    //         $pdf = PDF::loadView('pdf.attribution', [
-    //             'attributions' => $request->input('attributions')
-    //         ]);
-
-    //         $fileName = 'attributions/' . time() . '_' . $logement->id . '.pdf';
-    //         Storage::disk('public')->put($fileName, $pdf->output());
-
-    //         // 💾 Historique
-    //         Attribution::create([
-    //             'logement_id' => $logement->id,
-    //             'user_ids' => $attr['user_ids'],
-    //             'pdf' => $fileName
-    //         ]);
-
-    //         // 📧 Notifications aux étudiants
-    //         // foreach ($users as $user) {
-    //         //     $user->notify(new AttributionNotification($logement, $fileName));
-    //         // }
-    //     }
-
-    //     return redirect()->route('attributions.index')
-    //         ->with('success', 'Attributions enregistrées et notifications envoyées !');
-    // }
 
     public function store(Request $request)
     {
