@@ -47,6 +47,12 @@ class User extends Authenticatable
         ];
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | Relations
+    |--------------------------------------------------------------------------
+    */
+
     public function logement()
     {
         return $this->belongsTo(Logement::class);
@@ -75,5 +81,13 @@ class User extends Authenticatable
     public function caisses()
     {
         return $this->hasMany(Caisse::class);
+    }
+
+    /**
+     * Événements / informations partagés par cet utilisateur.
+     */
+    public function evenements()
+    {
+        return $this->hasMany(Evenements::class);
     }
 }

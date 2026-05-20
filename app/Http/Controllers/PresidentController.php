@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
 use App\Models\Logement;
 use App\Models\Type_logement;
 use App\Models\User;
@@ -12,6 +11,7 @@ use App\Models\Etablissement;
 use App\Models\Classe;
 use App\Models\Entite;
 use Inertia\Inertia;
+use Spatie\Permission\Models\Role;
 
 class PresidentController extends Controller
 {
@@ -66,14 +66,14 @@ class PresidentController extends Controller
             'logement.type_logement',
             'classe',
             'etablissement',
-            'entite'
+            'entite',
         ]);
 
         // 🔍 SEARCH (name + email)
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
                 $q->where('name', 'like', '%' . $request->search . '%')
-                  ->orWhere('email', 'like', '%' . $request->search . '%');
+                    ->orWhere('email', 'like', '%' . $request->search . '%');
             });
         }
 
@@ -116,7 +116,7 @@ class PresidentController extends Controller
                 'logement',
                 'type_logement',
                 'classe',
-                'etablissement'
+                'etablissement',
             ]),
 
             'niveaux'        => $niveaux,
@@ -128,7 +128,75 @@ class PresidentController extends Controller
         ]);
     }
 
-    // ✅ Méthode destroy pour la suppression d'un membre
+    /**
+     * ✅ Page gestion des rôles utilisateurs.
+     */
+    public function roles(Request $request)
+    {
+        $search = $request->input('search');
+
+        $users = User::with('roles')
+            ->when($search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', '%' . $search . '%')
+                        ->orWhere('email', 'like', '%' . $search . '%');
+                });
+            })
+            ->orderBy('name')
+            ->paginate(10)
+            ->withQueryString()
+            ->through(function ($user) {
+                return [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'contact' => $user->contact,
+                    'image' => $user->image ? asset('storage/' . $user->image) : null,
+
+                    // Tous les rôles de l'utilisateur
+                    'roles' => $user->roles->pluck('name')->values(),
+
+                    // Rôle principal affiché dans le select
+                    'current_role' => $user->roles->first()?->name,
+                ];
+            });
+
+        $roles = Role::orderBy('name')
+            ->get()
+            ->map(function ($role) {
+                return [
+                    'id' => $role->id,
+                    'name' => $role->name,
+                ];
+            });
+
+        return Inertia::render('President/Roles/Index', [
+            'users' => $users,
+            'roles' => $roles,
+            'filters' => [
+                'search' => $search,
+            ],
+        ]);
+    }
+
+    /**
+     * ✅ Modifier le rôle d'un utilisateur.
+     */
+    public function updateRole(Request $request, User $user)
+    {
+        $validated = $request->validate([
+            'role' => ['required', 'string', 'exists:roles,name'],
+        ]);
+
+        // Remplace tous les anciens rôles par le nouveau rôle choisi
+        $user->syncRoles([$validated['role']]);
+
+        return back()->with('success', 'Rôle utilisateur mis à jour avec succès.');
+    }
+
+    /**
+     * ✅ Suppression d'un membre.
+     */
     public function destroy(User $membre)
     {
         $membre->delete();

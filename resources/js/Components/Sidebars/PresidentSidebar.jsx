@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { Home, User2, Crown } from 'lucide-react';
+import { Home, User2, Crown, ShieldCheck } from 'lucide-react';
 
 export default function PresidentSidebar() {
     const isActive = (name) => route().current(name);
@@ -44,6 +44,16 @@ export default function PresidentSidebar() {
                     >
                         <User2 size={20} />
                         Gestion des membres
+                    </Link>
+                </li>
+
+                <li>
+                    <Link
+                        href={route('president.roles.index')}
+                        className={linkClass(isActive('president.roles.*'))}
+                    >
+                        <ShieldCheck size={20} />
+                        Gestion des rôles
                     </Link>
                 </li>
             </ul>

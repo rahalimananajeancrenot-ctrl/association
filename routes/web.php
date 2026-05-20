@@ -6,6 +6,8 @@ use App\Http\Controllers\PresidentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Tresorier\TresorierController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\MembreController;
+use App\Http\Controllers\SecretaireController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -98,6 +100,12 @@ Route::middleware(['auth', 'role:President'])
 
         Route::post('/register', [RegisteredUserController::class, 'store'])
             ->name('membres.registered');
+
+        Route::get('/roles', [PresidentController::class, 'roles'])
+            ->name('roles.index');
+
+        Route::patch('/roles/{user}', [PresidentController::class, 'updateRole'])
+            ->name('roles.update');
     });
 
 
@@ -116,7 +124,6 @@ Route::middleware(['auth', 'role:Tresorier'])
         Route::get('/rapports', [TresorierController::class, 'rapports'])
             ->name('rapports.index');
 
-        // ✅ Route PDF à ajouter
         Route::get('/rapports/pdf', [TresorierController::class, 'exportRapportPdf'])
             ->name('rapports.pdf');
 
@@ -128,6 +135,48 @@ Route::middleware(['auth', 'role:Tresorier'])
 
         Route::post('/ressources', [TresorierController::class, 'storeRessource'])
             ->name('ressources.store');
+    });
+
+
+// ✅ Module Membre / Notifications
+Route::middleware(['auth'])
+    ->prefix('membre')
+    ->name('membre.')
+    ->group(function () {
+        Route::get('/infos', [MembreController::class, 'infos'])
+            ->name('infos');
+
+        Route::get('/evenements', [MembreController::class, 'evenements'])
+            ->name('evenements.index');
+
+        Route::get('/notifications/{notification}', [MembreController::class, 'showNotification'])
+            ->name('notifications.show');
+
+        Route::patch('/notifications/{notification}/read', [MembreController::class, 'markNotificationAsRead'])
+            ->name('notifications.read');
+
+        Route::patch('/notifications/read-all', [MembreController::class, 'markAllNotificationsAsRead'])
+            ->name('notifications.readAll');
+    });
+
+
+// ✅ Module Secrétaire
+Route::middleware(['auth', 'role:Secretaire'])
+    ->prefix('secretaire')
+    ->name('secretaire.')
+    ->group(function () {
+
+        Route::get('/dashboard', [SecretaireController::class, 'index'])
+            ->name('dashboard');
+
+        Route::get('/evenements', [SecretaireController::class, 'index'])
+            ->name('evenements.index');
+
+        Route::post('/evenements', [SecretaireController::class, 'store'])
+            ->name('evenements.store');
+
+        Route::delete('/evenements/{evenement}', [SecretaireController::class, 'destroy'])
+            ->name('evenements.destroy');
     });
 
 
