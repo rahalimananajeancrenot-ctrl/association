@@ -3,7 +3,7 @@ import Dropdown from '@/Components/Dropdown';
 import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { Link, router, usePage } from '@inertiajs/react';
-import { useMemo, useState, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
     Sun,
     Moon,
@@ -20,9 +20,13 @@ import {
     Inbox,
 } from 'lucide-react';
 
-export default function AuthenticatedLayout({ header, children }) {
+export default function AuthenticatedLayout({
+    header,
+    children,
+    layoutMode = 'default',
+}) {
     const { auth, notifications } = usePage().props;
-    const user = auth.user;
+    const user = auth?.user;
 
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
@@ -48,11 +52,14 @@ export default function AuthenticatedLayout({ header, children }) {
     }, [notificationItems, notificationFilter]);
 
     useEffect(() => {
-        const savedTheme = localStorage.getItem('theme');
+        const savedTheme = localStorage.getItem('theme') || 'light';
 
         if (savedTheme === 'dark') {
             document.documentElement.classList.add('dark');
             setDarkMode(true);
+        } else {
+            document.documentElement.classList.remove('dark');
+            setDarkMode(false);
         }
     }, []);
 
@@ -60,12 +67,12 @@ export default function AuthenticatedLayout({ header, children }) {
         if (darkMode) {
             document.documentElement.classList.remove('dark');
             localStorage.setItem('theme', 'light');
+            setDarkMode(false);
         } else {
             document.documentElement.classList.add('dark');
             localStorage.setItem('theme', 'dark');
+            setDarkMode(true);
         }
-
-        setDarkMode(!darkMode);
     };
 
     const markAllAsRead = () => {
@@ -79,17 +86,46 @@ export default function AuthenticatedLayout({ header, children }) {
         );
     };
 
+    if (!user) {
+        return (
+            <div className="flex min-h-screen items-center justify-center bg-gray-100 dark:bg-black">
+                <div className="h-12 w-12 animate-spin rounded-full border-4 border-gray-300 border-t-indigo-600" />
+            </div>
+        );
+    }
+
+    /*
+     |--------------------------------------------------------------------------
+     | MODE SIDEBAR
+     |--------------------------------------------------------------------------
+     | Ce mode est utilisé par AppLayout.
+     | Il ne doit PAS afficher la navbar, le header et le main ici,
+     | parce que AppLayout gère déjà :
+     | - la sidebar
+     | - le header
+     | - le contenu principal
+     */
+    if (layoutMode === 'sidebar') {
+        return (
+            <div className="min-h-screen bg-gray-100 text-gray-800 transition-all duration-500 dark:bg-black dark:text-white">
+                {children}
+            </div>
+        );
+    }
+
+    /*
+     |--------------------------------------------------------------------------
+     | MODE DEFAULT
+     |--------------------------------------------------------------------------
+     | Ce mode garde l'ancien comportement pour les pages simples :
+     | membre, profil, infos, événements, etc.
+     */
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-100 via-gray-100 to-slate-200 text-gray-800 transition-all duration-500 dark:from-black dark:via-zinc-950 dark:to-zinc-900 dark:text-white">
-
             <nav className="sticky top-0 z-50 border-b border-white/20 bg-white/70 shadow-lg backdrop-blur-xl dark:bg-zinc-900/70">
-
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-
                     <div className="flex h-20 items-center justify-between">
-
                         <div className="flex items-center gap-10">
-
                             <Link
                                 href="/"
                                 className="group flex items-center gap-3"
@@ -110,7 +146,6 @@ export default function AuthenticatedLayout({ header, children }) {
                             </Link>
 
                             <div className="hidden items-center gap-3 sm:flex">
-
                                 <NavLink
                                     href={route('dashboard')}
                                     active={route().current('dashboard')}
@@ -140,15 +175,15 @@ export default function AuthenticatedLayout({ header, children }) {
                                         Événements
                                     </div>
                                 </NavLink>
-
                             </div>
                         </div>
 
                         <div className="hidden items-center gap-4 sm:flex">
-
                             <button
+                                type="button"
                                 onClick={toggleDarkMode}
                                 className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white shadow-md transition duration-300 hover:scale-110 hover:shadow-xl dark:bg-zinc-800"
+                                title="Changer le thème"
                             >
                                 {darkMode ? (
                                     <Sun className="h-5 w-5 text-yellow-400" />
@@ -157,18 +192,21 @@ export default function AuthenticatedLayout({ header, children }) {
                                 )}
                             </button>
 
-                            {/* NOTIFICATION BELL */}
                             <div className="relative">
                                 <button
                                     type="button"
-                                    onClick={() => setShowNotifications(!showNotifications)}
+                                    onClick={() =>
+                                        setShowNotifications(!showNotifications)
+                                    }
                                     className="relative flex h-11 w-11 items-center justify-center rounded-2xl bg-white shadow-md transition duration-300 hover:scale-110 hover:shadow-xl dark:bg-zinc-800"
                                 >
                                     <Bell className="h-5 w-5 text-indigo-600 dark:text-indigo-300" />
 
                                     {unreadCount > 0 && (
                                         <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1.5 text-xs font-black text-white">
-                                            {unreadCount > 9 ? '9+' : unreadCount}
+                                            {unreadCount > 9
+                                                ? '9+'
+                                                : unreadCount}
                                         </span>
                                     )}
                                 </button>
@@ -181,6 +219,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                                     <h3 className="font-black text-gray-900 dark:text-white">
                                                         Notifications
                                                     </h3>
+
                                                     <p className="text-xs text-gray-500 dark:text-gray-400">
                                                         {unreadCount} non lue(s)
                                                     </p>
@@ -189,7 +228,9 @@ export default function AuthenticatedLayout({ header, children }) {
                                                 <button
                                                     type="button"
                                                     onClick={markAllAsRead}
-                                                    disabled={unreadCount === 0}
+                                                    disabled={
+                                                        unreadCount === 0
+                                                    }
                                                     className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-3 py-2 text-xs font-bold text-indigo-700 transition hover:bg-indigo-100 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-indigo-950/40 dark:text-indigo-300"
                                                 >
                                                     <CheckCheck className="h-4 w-4" />
@@ -200,9 +241,14 @@ export default function AuthenticatedLayout({ header, children }) {
                                             <div className="mt-4 flex gap-2">
                                                 <button
                                                     type="button"
-                                                    onClick={() => setNotificationFilter('all')}
+                                                    onClick={() =>
+                                                        setNotificationFilter(
+                                                            'all'
+                                                        )
+                                                    }
                                                     className={`rounded-full px-3 py-1.5 text-xs font-bold ${
-                                                        notificationFilter === 'all'
+                                                        notificationFilter ===
+                                                        'all'
                                                             ? 'bg-indigo-600 text-white'
                                                             : 'bg-gray-100 text-gray-600 dark:bg-zinc-900 dark:text-gray-300'
                                                     }`}
@@ -212,9 +258,14 @@ export default function AuthenticatedLayout({ header, children }) {
 
                                                 <button
                                                     type="button"
-                                                    onClick={() => setNotificationFilter('unread')}
+                                                    onClick={() =>
+                                                        setNotificationFilter(
+                                                            'unread'
+                                                        )
+                                                    }
                                                     className={`rounded-full px-3 py-1.5 text-xs font-bold ${
-                                                        notificationFilter === 'unread'
+                                                        notificationFilter ===
+                                                        'unread'
                                                             ? 'bg-red-600 text-white'
                                                             : 'bg-gray-100 text-gray-600 dark:bg-zinc-900 dark:text-gray-300'
                                                     }`}
@@ -224,9 +275,14 @@ export default function AuthenticatedLayout({ header, children }) {
 
                                                 <button
                                                     type="button"
-                                                    onClick={() => setNotificationFilter('read')}
+                                                    onClick={() =>
+                                                        setNotificationFilter(
+                                                            'read'
+                                                        )
+                                                    }
                                                     className={`rounded-full px-3 py-1.5 text-xs font-bold ${
-                                                        notificationFilter === 'read'
+                                                        notificationFilter ===
+                                                        'read'
                                                             ? 'bg-green-600 text-white'
                                                             : 'bg-gray-100 text-gray-600 dark:bg-zinc-900 dark:text-gray-300'
                                                     }`}
@@ -237,70 +293,91 @@ export default function AuthenticatedLayout({ header, children }) {
                                         </div>
 
                                         <div className="max-h-96 overflow-y-auto">
-                                            {filteredNotifications.length > 0 ? (
-                                                filteredNotifications.map((notification) => (
-                                                    <Link
-                                                        key={notification.id}
-                                                        href={route('membre.notifications.show', notification.id)}
-                                                        className={`block border-b border-gray-100 p-4 transition hover:bg-indigo-50 dark:border-zinc-800 dark:hover:bg-indigo-950/30 ${
-                                                            notification.is_read
-                                                                ? 'bg-white dark:bg-zinc-950'
-                                                                : 'bg-indigo-50/70 dark:bg-indigo-950/20'
-                                                        }`}
-                                                    >
-                                                        <div className="flex gap-3">
-                                                            <div
-                                                                className={`mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl ${
-                                                                    notification.is_read
-                                                                        ? 'bg-gray-100 text-gray-500 dark:bg-zinc-900 dark:text-gray-400'
-                                                                        : 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300'
-                                                                }`}
-                                                            >
-                                                                <BellRing className="h-5 w-5" />
-                                                            </div>
+                                            {filteredNotifications.length >
+                                            0 ? (
+                                                filteredNotifications.map(
+                                                    (notification) => (
+                                                        <Link
+                                                            key={
+                                                                notification.id
+                                                            }
+                                                            href={route(
+                                                                'membre.notifications.show',
+                                                                notification.id
+                                                            )}
+                                                            className={`block border-b border-gray-100 p-4 transition hover:bg-indigo-50 dark:border-zinc-800 dark:hover:bg-indigo-950/30 ${
+                                                                notification.is_read
+                                                                    ? 'bg-white dark:bg-zinc-950'
+                                                                    : 'bg-indigo-50/70 dark:bg-indigo-950/20'
+                                                            }`}
+                                                        >
+                                                            <div className="flex gap-3">
+                                                                <div
+                                                                    className={`mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl ${
+                                                                        notification.is_read
+                                                                            ? 'bg-gray-100 text-gray-500 dark:bg-zinc-900 dark:text-gray-400'
+                                                                            : 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300'
+                                                                    }`}
+                                                                >
+                                                                    <BellRing className="h-5 w-5" />
+                                                                </div>
 
-                                                            <div className="min-w-0 flex-1">
-                                                                <div className="flex items-start justify-between gap-2">
-                                                                    <p className="line-clamp-1 font-bold text-gray-900 dark:text-white">
-                                                                        {notification.data?.title || 'Nouvelle notification'}
+                                                                <div className="min-w-0 flex-1">
+                                                                    <div className="flex items-start justify-between gap-2">
+                                                                        <p className="line-clamp-1 font-bold text-gray-900 dark:text-white">
+                                                                            {notification
+                                                                                .data
+                                                                                ?.title ||
+                                                                                'Nouvelle notification'}
+                                                                        </p>
+
+                                                                        {!notification.is_read && (
+                                                                            <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-red-600" />
+                                                                        )}
+                                                                    </div>
+
+                                                                    <p className="mt-1 line-clamp-2 text-sm text-gray-600 dark:text-gray-300">
+                                                                        {notification
+                                                                            .data
+                                                                            ?.description ||
+                                                                            'Nouvelle information publiée.'}
                                                                     </p>
 
-                                                                    {!notification.is_read && (
-                                                                        <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-red-600"></span>
-                                                                    )}
-                                                                </div>
+                                                                    <div className="mt-3 flex items-center justify-between gap-2">
+                                                                        <span className="text-xs text-gray-400">
+                                                                            {
+                                                                                notification.created_at
+                                                                            }
+                                                                        </span>
 
-                                                                <p className="mt-1 line-clamp-2 text-sm text-gray-600 dark:text-gray-300">
-                                                                    {notification.data?.description || 'Nouvelle information publiée.'}
-                                                                </p>
-
-                                                                <div className="mt-3 flex items-center justify-between gap-2">
-                                                                    <span className="text-xs text-gray-400">
-                                                                        {notification.created_at}
-                                                                    </span>
-
-                                                                    <span
-                                                                        className={`rounded-full px-3 py-1 text-xs font-bold ${
-                                                                            notification.is_read
-                                                                                ? 'bg-gray-100 text-gray-500 dark:bg-zinc-900 dark:text-gray-400'
-                                                                                : 'bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-300'
-                                                                        }`}
-                                                                    >
-                                                                        {notification.is_read ? 'Lu' : 'Non lu'}
-                                                                    </span>
+                                                                        <span
+                                                                            className={`rounded-full px-3 py-1 text-xs font-bold ${
+                                                                                notification.is_read
+                                                                                    ? 'bg-gray-100 text-gray-500 dark:bg-zinc-900 dark:text-gray-400'
+                                                                                    : 'bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-300'
+                                                                            }`}
+                                                                        >
+                                                                            {notification.is_read
+                                                                                ? 'Lu'
+                                                                                : 'Non lu'}
+                                                                        </span>
+                                                                    </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                                    </Link>
-                                                ))
+                                                        </Link>
+                                                    )
+                                                )
                                             ) : (
                                                 <div className="p-8 text-center">
                                                     <Inbox className="mx-auto mb-3 h-10 w-10 text-gray-300 dark:text-zinc-700" />
+
                                                     <p className="font-bold text-gray-900 dark:text-white">
                                                         Aucune notification
                                                     </p>
+
                                                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                                                        Rien à afficher pour ce filtre.
+                                                        Rien à afficher pour ce
+                                                        filtre.
                                                     </p>
                                                 </div>
                                             )}
@@ -308,7 +385,9 @@ export default function AuthenticatedLayout({ header, children }) {
 
                                         <div className="border-t border-gray-200 p-3 dark:border-zinc-800">
                                             <Link
-                                                href={route('membre.evenements.index')}
+                                                href={route(
+                                                    'membre.evenements.index'
+                                                )}
                                                 className="flex items-center justify-center rounded-2xl bg-indigo-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-indigo-700"
                                             >
                                                 Voir tous les événements
@@ -319,16 +398,12 @@ export default function AuthenticatedLayout({ header, children }) {
                             </div>
 
                             <div className="relative">
-
                                 <Dropdown>
-
                                     <Dropdown.Trigger>
-
                                         <button
                                             type="button"
                                             className="flex items-center gap-3 rounded-2xl bg-white px-3 py-2 shadow-md transition-all duration-300 hover:shadow-xl dark:bg-zinc-800"
                                         >
-
                                             {user.image ? (
                                                 <img
                                                     src={`/storage/${user.image}`}
@@ -337,7 +412,9 @@ export default function AuthenticatedLayout({ header, children }) {
                                                 />
                                             ) : (
                                                 <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 text-lg font-bold text-white shadow-lg">
-                                                    {user.name.charAt(0)}
+                                                    {user.name
+                                                        ?.charAt(0)
+                                                        ?.toUpperCase()}
                                                 </div>
                                             )}
 
@@ -347,7 +424,9 @@ export default function AuthenticatedLayout({ header, children }) {
                                                 </div>
 
                                                 <div className="text-xs text-gray-500 dark:text-gray-400">
-                                                    {user.role}
+                                                    {user.role ||
+                                                        user.roles?.[0]?.name ||
+                                                        'Utilisateur'}
                                                 </div>
                                             </div>
 
@@ -363,13 +442,10 @@ export default function AuthenticatedLayout({ header, children }) {
                                                     clipRule="evenodd"
                                                 />
                                             </svg>
-
                                         </button>
-
                                     </Dropdown.Trigger>
 
                                     <Dropdown.Content>
-
                                         <Dropdown.Link
                                             href={route('membre.infos')}
                                         >
@@ -380,7 +456,9 @@ export default function AuthenticatedLayout({ header, children }) {
                                         </Dropdown.Link>
 
                                         <Dropdown.Link
-                                            href={route('membre.evenements.index')}
+                                            href={route(
+                                                'membre.evenements.index'
+                                            )}
                                         >
                                             <div className="flex items-center gap-2">
                                                 <BellRing className="h-4 w-4" />
@@ -407,18 +485,14 @@ export default function AuthenticatedLayout({ header, children }) {
                                                 Déconnexion
                                             </div>
                                         </Dropdown.Link>
-
                                     </Dropdown.Content>
-
                                 </Dropdown>
-
                             </div>
-
                         </div>
 
                         <div className="flex sm:hidden">
-
                             <button
+                                type="button"
                                 onClick={() =>
                                     setShowingNavigationDropdown(
                                         !showingNavigationDropdown
@@ -432,11 +506,8 @@ export default function AuthenticatedLayout({ header, children }) {
                                     <Menu className="h-5 w-5" />
                                 )}
                             </button>
-
                         </div>
-
                     </div>
-
                 </div>
 
                 <div
@@ -444,9 +515,7 @@ export default function AuthenticatedLayout({ header, children }) {
                         showingNavigationDropdown ? 'block' : 'hidden'
                     } border-t border-white/10 bg-white/80 backdrop-blur-xl dark:bg-zinc-900/80 sm:hidden`}
                 >
-
                     <div className="space-y-3 p-4">
-
                         <ResponsiveNavLink
                             href={route('dashboard')}
                             active={route().current('dashboard')}
@@ -476,13 +545,10 @@ export default function AuthenticatedLayout({ header, children }) {
                                 Événements
                             </div>
                         </ResponsiveNavLink>
-
                     </div>
 
                     <div className="border-t border-gray-200 p-4 dark:border-zinc-700">
-
                         <div className="flex items-center gap-3">
-
                             {user.image ? (
                                 <img
                                     src={`/storage/${user.image}`}
@@ -491,7 +557,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                 />
                             ) : (
                                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 font-bold text-white">
-                                    {user.name.charAt(0)}
+                                    {user.name?.charAt(0)?.toUpperCase()}
                                 </div>
                             )}
 
@@ -504,11 +570,9 @@ export default function AuthenticatedLayout({ header, children }) {
                                     {user.email}
                                 </div>
                             </div>
-
                         </div>
 
                         <div className="mt-5 space-y-3">
-
                             <ResponsiveNavLink href={route('membre.infos')}>
                                 <div className="flex items-center justify-between rounded-2xl bg-emerald-50 px-4 py-3 shadow-sm transition-all duration-300 hover:bg-emerald-100 hover:shadow-md dark:bg-emerald-950/40 dark:hover:bg-emerald-900/50">
                                     <div className="flex items-center gap-3">
@@ -520,6 +584,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                             <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-300">
                                                 Mes informations
                                             </p>
+
                                             <p className="text-xs text-emerald-600 dark:text-emerald-400">
                                                 Suivre mon droit annuel
                                             </p>
@@ -530,7 +595,9 @@ export default function AuthenticatedLayout({ header, children }) {
                                 </div>
                             </ResponsiveNavLink>
 
-                            <ResponsiveNavLink href={route('membre.evenements.index')}>
+                            <ResponsiveNavLink
+                                href={route('membre.evenements.index')}
+                            >
                                 <div className="flex items-center justify-between rounded-2xl bg-indigo-50 px-4 py-3 shadow-sm transition-all duration-300 hover:bg-indigo-100 hover:shadow-md dark:bg-indigo-950/40 dark:hover:bg-indigo-900/50">
                                     <div className="flex items-center gap-3">
                                         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-100 text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-300">
@@ -541,6 +608,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                             <p className="text-sm font-semibold text-indigo-800 dark:text-indigo-300">
                                                 Événements
                                             </p>
+
                                             <p className="text-xs text-indigo-600 dark:text-indigo-400">
                                                 Infos de l'association
                                             </p>
@@ -562,6 +630,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                             <p className="text-sm font-semibold text-gray-800 dark:text-white">
                                                 Mon Profil
                                             </p>
+
                                             <p className="text-xs text-gray-500 dark:text-gray-400">
                                                 Modifier mes informations
                                             </p>
@@ -587,6 +656,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                             <p className="text-sm font-semibold text-red-700 dark:text-red-300">
                                                 Déconnexion
                                             </p>
+
                                             <p className="text-xs text-red-500 dark:text-red-400">
                                                 Quitter la session
                                             </p>
@@ -596,33 +666,22 @@ export default function AuthenticatedLayout({ header, children }) {
                                     <ChevronRight className="h-4 w-4 text-red-400" />
                                 </div>
                             </ResponsiveNavLink>
-
                         </div>
-
                     </div>
-
                 </div>
-
             </nav>
 
             {header && (
                 <header className="py-6">
                     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-
                         <div className="rounded-3xl border border-white/20 bg-white/70 p-6 shadow-xl backdrop-blur-xl dark:bg-zinc-900/70">
-
                             {header}
-
                         </div>
-
                     </div>
                 </header>
             )}
 
-            <main className="pb-10">
-                {children}
-            </main>
-
+            <main className="pb-10">{children}</main>
         </div>
     );
 }
