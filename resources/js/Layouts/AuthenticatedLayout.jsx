@@ -39,6 +39,42 @@ export default function AuthenticatedLayout({
     const notificationItems = notifications?.items || [];
     const unreadCount = notifications?.unread_count || 0;
 
+    const userRole =
+        user?.roles?.[0]?.name ||
+        user?.roles?.[0] ||
+        user?.role ||
+        'Membre';
+
+    const dashboardRoutes = {
+        President: {
+            routeName: 'president.dashboard',
+            label: 'Retour espace Président',
+            description: 'Revenir au tableau de bord président',
+        },
+        Tresorier: {
+            routeName: 'tresorier.dashboard',
+            label: 'Retour espace Trésorier',
+            description: 'Revenir au tableau de bord trésorier',
+        },
+        Secretaire: {
+            routeName: 'secretaire.dashboard',
+            label: 'Retour espace Secrétaire',
+            description: 'Revenir au tableau de bord secrétaire',
+        },
+        Logement: {
+            routeName: 'dashboard.logements',
+            label: 'Retour espace Logement',
+            description: 'Revenir au tableau de bord logement',
+        },
+        Membre: {
+            routeName: 'dashboard',
+            label: 'Retour à mon espace',
+            description: 'Revenir à votre espace principal',
+        },
+    };
+
+    const dashboardLink = dashboardRoutes[userRole] || dashboardRoutes.Membre;
+
     const filteredNotifications = useMemo(() => {
         if (notificationFilter === 'unread') {
             return notificationItems.filter((item) => !item.is_read);
@@ -118,7 +154,7 @@ export default function AuthenticatedLayout({
      | MODE DEFAULT
      |--------------------------------------------------------------------------
      | Ce mode garde l'ancien comportement pour les pages simples :
-     | membre, profil, infos, événements, etc.
+     | membre, profil, infos, événements, notifications, etc.
      */
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-100 via-gray-100 to-slate-200 text-gray-800 transition-all duration-500 dark:from-black dark:via-zinc-950 dark:to-zinc-900 dark:text-white">
@@ -147,12 +183,12 @@ export default function AuthenticatedLayout({
 
                             <div className="hidden items-center gap-3 sm:flex">
                                 <NavLink
-                                    href={route('dashboard')}
-                                    active={route().current('dashboard')}
+                                    href={route(dashboardLink.routeName)}
+                                    active={route().current(dashboardLink.routeName)}
                                 >
                                     <div className="flex items-center gap-2">
                                         <LayoutDashboard className="h-4 w-4" />
-                                        Dashboard
+                                        Mon espace
                                     </div>
                                 </NavLink>
 
@@ -199,6 +235,7 @@ export default function AuthenticatedLayout({
                                         setShowNotifications(!showNotifications)
                                     }
                                     className="relative flex h-11 w-11 items-center justify-center rounded-2xl bg-white shadow-md transition duration-300 hover:scale-110 hover:shadow-xl dark:bg-zinc-800"
+                                    title="Notifications"
                                 >
                                     <Bell className="h-5 w-5 text-indigo-600 dark:text-indigo-300" />
 
@@ -301,10 +338,13 @@ export default function AuthenticatedLayout({
                                                             key={
                                                                 notification.id
                                                             }
-                                                            href={route(
-                                                                'membre.notifications.show',
-                                                                notification.id
-                                                            )}
+                                                            href={
+                                                                notification.show_url ||
+                                                                route(
+                                                                    'membre.notifications.show',
+                                                                    notification.id
+                                                                )
+                                                            }
                                                             className={`block border-b border-gray-100 p-4 transition hover:bg-indigo-50 dark:border-zinc-800 dark:hover:bg-indigo-950/30 ${
                                                                 notification.is_read
                                                                     ? 'bg-white dark:bg-zinc-950'
@@ -424,9 +464,7 @@ export default function AuthenticatedLayout({
                                                 </div>
 
                                                 <div className="text-xs text-gray-500 dark:text-gray-400">
-                                                    {user.role ||
-                                                        user.roles?.[0]?.name ||
-                                                        'Utilisateur'}
+                                                    {userRole || 'Utilisateur'}
                                                 </div>
                                             </div>
 
@@ -446,6 +484,15 @@ export default function AuthenticatedLayout({
                                     </Dropdown.Trigger>
 
                                     <Dropdown.Content>
+                                        <Dropdown.Link
+                                            href={route(dashboardLink.routeName)}
+                                        >
+                                            <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-300">
+                                                <LayoutDashboard className="h-4 w-4" />
+                                                {dashboardLink.label}
+                                            </div>
+                                        </Dropdown.Link>
+
                                         <Dropdown.Link
                                             href={route('membre.infos')}
                                         >
@@ -517,12 +564,12 @@ export default function AuthenticatedLayout({
                 >
                     <div className="space-y-3 p-4">
                         <ResponsiveNavLink
-                            href={route('dashboard')}
-                            active={route().current('dashboard')}
+                            href={route(dashboardLink.routeName)}
+                            active={route().current(dashboardLink.routeName)}
                         >
                             <div className="flex items-center gap-3">
                                 <LayoutDashboard className="h-5 w-5" />
-                                Dashboard
+                                Mon espace
                             </div>
                         </ResponsiveNavLink>
 
@@ -573,6 +620,30 @@ export default function AuthenticatedLayout({
                         </div>
 
                         <div className="mt-5 space-y-3">
+                            <ResponsiveNavLink
+                                href={route(dashboardLink.routeName)}
+                            >
+                                <div className="flex items-center justify-between rounded-2xl bg-indigo-50 px-4 py-3 shadow-sm transition-all duration-300 hover:bg-indigo-100 hover:shadow-md dark:bg-indigo-950/40 dark:hover:bg-indigo-900/50">
+                                    <div className="flex items-center gap-3">
+                                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-100 text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-300">
+                                            <LayoutDashboard className="h-5 w-5" />
+                                        </div>
+
+                                        <div>
+                                            <p className="text-sm font-semibold text-indigo-800 dark:text-indigo-300">
+                                                {dashboardLink.label}
+                                            </p>
+
+                                            <p className="text-xs text-indigo-600 dark:text-indigo-400">
+                                                {dashboardLink.description}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <ChevronRight className="h-4 w-4 text-indigo-500" />
+                                </div>
+                            </ResponsiveNavLink>
+
                             <ResponsiveNavLink href={route('membre.infos')}>
                                 <div className="flex items-center justify-between rounded-2xl bg-emerald-50 px-4 py-3 shadow-sm transition-all duration-300 hover:bg-emerald-100 hover:shadow-md dark:bg-emerald-950/40 dark:hover:bg-emerald-900/50">
                                     <div className="flex items-center gap-3">

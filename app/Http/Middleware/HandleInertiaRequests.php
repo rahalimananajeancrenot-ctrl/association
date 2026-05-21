@@ -43,9 +43,16 @@ class HandleInertiaRequests extends Middleware
                     'adresse' => $user->adresse,
                     'image' => $user->image,
 
-                    // ✅ Spatie roles
+                    // ✅ Rôle principal simple pour affichage
                     'role' => $user->getRoleNames()->first(),
-                    'roles' => $user->getRoleNames()->values(),
+
+                    // ✅ Format attendu par AppLayout :
+                    // auth.user.roles[0].name
+                    'roles' => $user->getRoleNames()
+                        ->map(fn ($role) => [
+                            'name' => $role,
+                        ])
+                        ->values(),
                 ] : null,
             ],
 
@@ -76,10 +83,13 @@ class HandleInertiaRequests extends Middleware
                             'data' => $notification->data,
 
                             // ✅ Lien direct vers la page single notification
-                            // En cliquant dessus, le contrôleur va marquer la notification comme lue
-                            'show_url' => route('membre.notifications.show', $notification->id),
+                            'show_url' => route(
+                                'membre.notifications.show',
+                                $notification->id
+                            ),
                         ];
-                    }),
+                    })
+                    ->values(),
             ] : [
                 'unread_count' => 0,
                 'items' => [],
