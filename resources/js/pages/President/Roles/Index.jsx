@@ -210,15 +210,19 @@ export default function Index({ users, roles = [], filters = {} }) {
 }
 
 function RoleRow({ user, roles }) {
-    const { data, setData, patch, processing } = useForm({
+    const { data, setData, post, processing } = useForm({
         role: user.current_role || '',
+        _method: 'patch',
     });
 
     const submit = (e) => {
         e.preventDefault();
 
-        patch(route('president.roles.update', user.id), {
+        post(route('president.roles.update', user.id), {
             preserveScroll: true,
+            onError: (errors) => {
+                console.log(errors);
+            },
         });
     };
 
