@@ -1,5 +1,5 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, usePage, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { useRef } from 'react';
 import {
     Camera,
@@ -14,7 +14,6 @@ import {
 } from 'lucide-react';
 
 import UpdatePasswordForm from './Partials/UpdatePasswordForm';
-import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm';
 
 export default function Edit({ mustVerifyEmail, status }) {
     const { auth } = usePage().props;
@@ -33,6 +32,7 @@ export default function Edit({ mustVerifyEmail, status }) {
     const submitImage = () => {
         post('/profile/photo', {
             preserveScroll: true,
+            forceFormData: true,
         });
     };
 
@@ -205,7 +205,8 @@ export default function Edit({ mustVerifyEmail, status }) {
                                 </p>
                             </div>
 
-                            <UpdateProfileInformationForm
+                            <UpdateProfileInformationFormFixed
+                                user={user}
                                 mustVerifyEmail={mustVerifyEmail}
                                 status={status}
                             />
@@ -228,6 +229,130 @@ export default function Edit({ mustVerifyEmail, status }) {
                 </div>
             </div>
         </AuthenticatedLayout>
+    );
+}
+
+function UpdateProfileInformationFormFixed({ user, mustVerifyEmail, status }) {
+    const { data, setData, post, processing, errors, recentlySuccessful } = useForm({
+        name: user.name || '',
+        email: user.email || '',
+        contact: user.contact || '',
+        adresse: user.adresse || '',
+        _method: 'patch',
+    });
+
+    const submit = (e) => {
+        e.preventDefault();
+
+        // Important pour la production/cPanel : on évite le vrai PATCH HTTP.
+        // La requête part en POST, et Laravel comprend PATCH grâce à _method.
+        post(route('profile.update'), {
+            preserveScroll: true,
+            onError: (errors) => console.log(errors),
+        });
+    };
+
+    return (
+        <form onSubmit={submit} className="space-y-5">
+            <div>
+                <label htmlFor="name" className="mb-2 block text-sm font-bold text-gray-700 dark:text-gray-300">
+                    Nom complet
+                </label>
+                <input
+                    id="name"
+                    type="text"
+                    value={data.name}
+                    onChange={(e) => setData('name', e.target.value)}
+                    className="w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-gray-900 shadow-sm outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-zinc-700 dark:bg-zinc-950 dark:text-white"
+                    autoComplete="name"
+                    required
+                />
+                {errors.name && <p className="mt-2 text-sm font-semibold text-red-600">{errors.name}</p>}
+            </div>
+
+            <div>
+                <label htmlFor="email" className="mb-2 block text-sm font-bold text-gray-700 dark:text-gray-300">
+                    Adresse email
+                </label>
+                <input
+                    id="email"
+                    type="email"
+                    value={data.email}
+                    onChange={(e) => setData('email', e.target.value)}
+                    className="w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-gray-900 shadow-sm outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-zinc-700 dark:bg-zinc-950 dark:text-white"
+                    autoComplete="username"
+                    required
+                />
+                {errors.email && <p className="mt-2 text-sm font-semibold text-red-600">{errors.email}</p>}
+            </div>
+
+            <div>
+                <label htmlFor="contact" className="mb-2 block text-sm font-bold text-gray-700 dark:text-gray-300">
+                    Contact
+                </label>
+                <input
+                    id="contact"
+                    type="text"
+                    value={data.contact}
+                    onChange={(e) => setData('contact', e.target.value)}
+                    className="w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-gray-900 shadow-sm outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-zinc-700 dark:bg-zinc-950 dark:text-white"
+                    autoComplete="tel"
+                />
+                {errors.contact && <p className="mt-2 text-sm font-semibold text-red-600">{errors.contact}</p>}
+            </div>
+
+            <div>
+                <label htmlFor="adresse" className="mb-2 block text-sm font-bold text-gray-700 dark:text-gray-300">
+                    Adresse
+                </label>
+                <input
+                    id="adresse"
+                    type="text"
+                    value={data.adresse}
+                    onChange={(e) => setData('adresse', e.target.value)}
+                    className="w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-gray-900 shadow-sm outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-zinc-700 dark:bg-zinc-950 dark:text-white"
+                    autoComplete="street-address"
+                />
+                {errors.adresse && <p className="mt-2 text-sm font-semibold text-red-600">{errors.adresse}</p>}
+            </div>
+
+            {mustVerifyEmail && user.email_verified_at === null && (
+                <div className="rounded-2xl bg-yellow-50 p-4 text-sm text-yellow-800 dark:bg-yellow-500/10 dark:text-yellow-200">
+                    Votre adresse email n'est pas vérifiée.
+                    <Link
+                        href={route('verification.send')}
+                        method="post"
+                        as="button"
+                        className="ml-1 font-bold underline"
+                    >
+                        Renvoyer l'email de vérification.
+                    </Link>
+
+                    {status === 'verification-link-sent' && (
+                        <p className="mt-2 font-bold text-emerald-600 dark:text-emerald-300">
+                            Un nouveau lien de vérification a été envoyé.
+                        </p>
+                    )}
+                </div>
+            )}
+
+            <div className="flex items-center gap-4">
+                <button
+                    type="submit"
+                    disabled={processing}
+                    className="inline-flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 px-5 py-3 font-bold text-white shadow-lg shadow-emerald-600/20 transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                    <Save className="h-5 w-5" />
+                    {processing ? 'Enregistrement...' : 'Enregistrer'}
+                </button>
+
+                {recentlySuccessful && (
+                    <p className="text-sm font-bold text-emerald-600 dark:text-emerald-300">
+                        Informations enregistrées.
+                    </p>
+                )}
+            </div>
+        </form>
     );
 }
 
